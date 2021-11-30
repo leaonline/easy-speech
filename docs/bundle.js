@@ -582,6 +582,7 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
     utterance.pitch = getValue({ pitch });
     utterance.rate = getValue({ rate });
     utterance.volume = getValue({ volume });
+    debugUtterance(utterance);
 
     utteranceEvents.forEach(name => {
       const fn = handlers[name];
@@ -629,6 +630,11 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
       internal.speechSynthesis.speak(utterance);
     }, 10);
   })
+};
+
+/** @private **/
+const debugUtterance = ({ voice, pitch, rate, volume }) => {
+  debug(`utterance: voice=${voice.name} volume=${volume} rate=${rate} pitch=${pitch}`);
 };
 
 /**
