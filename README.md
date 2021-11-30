@@ -99,3 +99,7 @@ This project used several resources to gain insights about how to get the best c
 - https://stackoverflow.com/questions/33889107/speech-synthesis-in-chrome-for-android-not-loading-voices
 - https://stackoverflow.com/questions/49506716/speechsynthesis-getvoices-returns-empty-array-on-windows
 - https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
+
+## License
+
+MIT, see [license file](./LICENSE)
