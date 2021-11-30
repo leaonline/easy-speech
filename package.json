@@ -43,7 +43,7 @@
     "url": "https://paypal.me/kuesterjan"
   },
   "engines": {
-    "node": ">= 10.12.0"
+    "node": ">= 14.x"
   },
   "files": [
     "index.js",
