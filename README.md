@@ -1,5 +1,9 @@
 # Easy Speech
 
+![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+![GitHub](https://img.shields.io/github/license/jankapunkt/easy-speech)
+
 Cross browser Speech Synthesis
 
 This project was created, because it's always a struggle to get the synthesis
