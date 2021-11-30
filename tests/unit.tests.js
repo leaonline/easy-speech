@@ -165,8 +165,9 @@ describe('unit tests', function () {
     })
     it('completes when loaded voices is available', async function () {
       const SpeechSynthesisUtterance = createUtteranceClass()
+      const id = randomId()
       const speechSynthesis = {
-        getVoices: () => [{}]
+        getVoices: () => [{ id }]
       }
       globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
       globalThis.speechSynthesis = speechSynthesis
@@ -183,7 +184,8 @@ describe('unit tests', function () {
         speechSynthesisVoice: undefined,
         speechSynthesisEvent: undefined,
         speechSynthesisErrorEvent: undefined,
-        voices: [{}],
+        voices: [{ id }],
+        defaultVoice: { id },
         defaults: {
           pitch: 1,
           rate: 1,
@@ -223,7 +225,8 @@ describe('unit tests', function () {
             speechSynthesisVoice: undefined,
             speechSynthesisEvent: undefined,
             speechSynthesisErrorEvent: undefined,
-            voices: [{}],
+            voices: [{ id }],
+            defaultVoice: { id },
             defaults: {
               pitch: 1,
               rate: 1,
@@ -243,8 +246,9 @@ describe('unit tests', function () {
           done()
         })
 
+      const id = randomId()
       setTimeout(() => {
-        speechSynthesis.getVoices = () => [{}]
+        speechSynthesis.getVoices = () => [{ id }]
       }, 500)
     })
     it('completes when loaded voices is available in onvoiceschanged', function (done) {
@@ -269,7 +273,8 @@ describe('unit tests', function () {
             speechSynthesisVoice: undefined,
             speechSynthesisEvent: undefined,
             speechSynthesisErrorEvent: undefined,
-            voices: [{}],
+            voices: [{ id }],
+            defaultVoice: { id },
             defaults: {
               pitch: 1,
               rate: 1,
@@ -289,8 +294,9 @@ describe('unit tests', function () {
           done()
         })
 
+      const id = randomId()
       setTimeout(() => {
-        speechSynthesis.getVoices = () => [{}]
+        speechSynthesis.getVoices = () => [{ id }]
         speechSynthesis.onvoiceschanged()
       }, 500)
     })
@@ -454,6 +460,87 @@ describe('unit tests', function () {
         .catch(e => done(e))
         .then(async () => {
           await EasySpeech.speak({ text })
+        })
+    })
+    it('uses voice intervals to handle longer texts', function (done) {
+      const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
+        constructor (text) {
+          this.text = text
+        }
+
+        addEventListener (name, fn) {
+          if (name === 'start') this.listener = fn
+        }
+      }
+
+      const text = randomId()
+      let pauseCalled = false
+      let resumeCalled = false
+
+      const speechSynthesis = {
+        getVoices: () => [{}],
+        speak: function (u) {
+          u.listener() // start event
+          expect(u.text).to.equal(text)
+          setTimeout(() => {
+            expect(pauseCalled).to.equal(true)
+            expect(resumeCalled).to.equal(true)
+            done()
+          }, 1500)
+        },
+        cancel: () => {},
+        pause: () => {
+          pauseCalled = true
+        },
+        resume: () => {
+          resumeCalled = true
+        }
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      globalThis.SpeechSynthesisVoice = function (lang, name, voiceURI) {
+        this.lang = lang
+        this.name = name
+        this.voiceURI = voiceURI
+      }
+
+      EasySpeech.init()
+        .catch(e => done(e))
+        .then(async () => {
+          await EasySpeech.speak({ text })
+        })
+    })
+    it('allows to override defaults', function (done) {
+      const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
+        constructor (text) {
+          this.text = text
+        }
+
+        addEventListener () {}
+      }
+
+      const text = randomId()
+      const speechSynthesis = {
+        getVoices: () => [{}],
+        speak: function (u) {
+          expect(u.text).to.equal(text)
+          expect(u.pitch).to.equal(1.123456789)
+          expect(u.voice.id).to.equal(id)
+          done()
+        },
+        cancel: () => {},
+        pause: () => {},
+        resume: () => {}
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+
+      const id = randomId()
+
+      EasySpeech.init()
+        .catch(e => done(e))
+        .then(async () => {
+          await EasySpeech.speak({ text, pitch: 1.123456789, voice: { id } })
         })
     })
     it('allows to add custom listeners', function (done) {
