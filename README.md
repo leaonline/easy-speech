@@ -1,9 +1,10 @@
 # Easy Speech
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Test suite](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml)
 [![CodeQL Semantic Analysis](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![GitHub](https://img.shields.io/github/license/jankapunkt/easy-speech)
 
 Cross browser Speech Synthesis
