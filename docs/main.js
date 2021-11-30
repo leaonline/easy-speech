@@ -160,7 +160,7 @@ async function populateVoices (initialized) {
 
   inputs.voice.addEventListener('change', e => {
     const value = Number.parseInt(e.target.value, 10)
-    if (!value) {
+    if (Number.isNaN(value) || value < 0 || value >= filteredVoices.length - 1) {
       values.voice = undefined
       return
     }
