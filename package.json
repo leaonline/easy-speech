@@ -1,0 +1,52 @@
+{
+  "name": "easy-speech",
+  "version": "1.0.0",
+  "description": "Cross browser Speech Synthesis",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
+    "test-debug": "NODE_ENV=test ./node_modules/.bin/mocha  --inspect --debug-brk 'tests/**/*.tests.js'",
+    "test:coverage": "NODE_ENV=test c8 --all --reporter=html --reporter=text ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
+    "lint": "standard . | snazzy",
+    "lint:fix": "standard . --fix | snazzy",
+    "docs": "jsdoc2md index.js > API.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jankapunkt/easy-speech.git"
+  },
+  "keywords": [
+    "webspeech",
+    "speechsynthesis",
+    "browser",
+    "web",
+    "standards"
+  ],
+  "author": "Jan Küster <info@jankuester.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jankapunkt/easy-speech/issues"
+  },
+  "homepage": "https://github.com/jankapunkt/easy-speech#readme",
+  "devDependencies": {
+    "c8": "^7.10.0",
+    "chai": "^4.3.4",
+    "jsdoc-to-markdown": "^7.1.0",
+    "mocha": "^9.1.3",
+    "sinon": "^12.0.1",
+    "snazzy": "^9.0.0",
+    "standard": "^16.0.4"
+  },
+  "funding": {
+    "type": "PayPal",
+    "url": "https://paypal.me/kuesterjan"
+  },
+  "engines": {
+    "node": ">= 10.12.0"
+  },
+  "files": [
+    "index.js",
+    "API.md"
+  ]
+}
