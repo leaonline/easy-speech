@@ -299,6 +299,25 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
       if (voices.length > 0) {
         internal.voices = voices
         status(`voices loaded: ${voices.length}`)
+
+        // if we find a default voice, set it as default
+        internal.defaultVoice = voices.find(v => v.default)
+
+        // otherwise let's stick to the first one we can find by locale
+        if (!internal.defaultVoice) {
+          const language = scope.navigator?.language || ''
+          const lang = language.split('-')[0]
+
+          internal.defaultVoice = voices.find(v => {
+            return v.lang && (v.lang.indexOf(`${lang}-`) > -1 || v.lang.indexOf(`${lang}_`) > -1)
+          })
+        }
+
+        // otherwise let's use the first element in the array
+        if (!internal.defaultVoice) {
+          internal.defaultVoice = voices[0]
+        }
+
         return true
       }
       return false
@@ -477,7 +496,11 @@ EasySpeech.defaults = (options) => {
  * @param voice
  * @return {*|SpeechSynthesisVoice|{}}
  */
-const getCurrentVoice = voice => voice || internal.defaults.voice || internal.voices[0] || {}
+const getCurrentVoice = voice => voice ||
+  internal.defaults.voice ||
+  internal.defaultVoice ||
+  internal.voices[0] ||
+  {}
 
 /**
  * Creates a new `SpeechSynthesisUtterance` instance
@@ -672,6 +695,7 @@ EasySpeech.reset = () => {
     speechSynthesisEvent: null,
     speechSynthesisErrorEvent: null,
     voices: null,
+    defaultVoice: null,
     defaults: {
       pitch: 1,
       rate: 1,
