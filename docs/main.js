@@ -1,3 +1,4 @@
+/* global document EasySpeech */
 document.body.onload = async () => {
   createLog()
   appendFeatures(EasySpeech.detect())
@@ -109,7 +110,7 @@ async function populateVoices (initialized) {
   const languages = new Set()
 
   voices.forEach(voice => {
-    languages.add(voice.lang.split(/[\-_]/)[0])
+    languages.add(voice.lang.split(/[-_]/)[0])
   })
 
   debug(`found ${languages.size} languages`)
@@ -179,17 +180,22 @@ function initSpeak (inititalized) {
 
   speakButton.addEventListener('click', async event => {
     speakButton.disabled = true
-    allInputs.forEach(input => input.disabled = true)
+    allInputs.forEach(input => {
+      input.disabled = true
+    })
 
     const { pitch, rate, voice, volume } = getValues()
     const text = inputs.text.value
+
     try {
       await EasySpeech.speak({ text, pitch, rate, voice, volume })
     } catch (e) {
       debug(e.message)
     } finally {
       speakButton.disabled = false
-      allInputs.forEach(input => input.disabled = false)
+      allInputs.forEach(input => {
+        input.disabled = false
+      })
     }
   })
 }
@@ -201,8 +207,7 @@ function appendFeatures (detected) {
   Object.entries(detected).forEach(([key, value]) => {
     if (typeof value === 'object') {
       features[key] = value.toString()
-    }
-    else if (typeof value === 'function') {
+    } else if (typeof value === 'function') {
       features[key] = value.name
     } else {
       features[key] = value
