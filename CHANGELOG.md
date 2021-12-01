@@ -1,0 +1,10 @@
+**next**
+- coverage only includes main file
+- fix issue in docs/pages where first selected voice is ignored
+- debug utterance properties when speaking
+- load default voices when exist or use fallbacks when not
+- coverage improved to ~98%
+- fix broken feature detected by using bracket notation in favour of 'in' keyword
+
+**1.0.0**
+- initial implementation

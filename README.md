@@ -4,8 +4,7 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Test suite](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml)
 [![CodeQL Semantic Analysis](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml)
-![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
-![GitHub](https://img.shields.io/github/license/jankapunkt/easy-speech)
+
 
 Cross browser Speech Synthesis
 
@@ -70,7 +69,9 @@ EasySpeech.init({ maxTimeout: 5000, interval: 250 })
     .catch(e => console.error(e))
 ``` 
 
-It will go through several stages to setup the environment:
+#### Loading voices
+
+The init-routine will go through several stages to setup the environment:
 
 - detect and that SpeechSynthesis is basically supported, if not -> fail
 - load voices directly
@@ -81,13 +82,54 @@ It will go through several stages to setup the environment:
 - if voices are loaded until then -> complete
 - if no voices found -> fail 
 
+If your init routing has still not detected / loaded any voices, allthough
+speechSynth is supported please leave an issue!
+
+#### Placing a fallback voice
+
+If voices are found it will place a fallback voice by the following rules:
+
+- If there is a voice among all voices with the `default` property set to true
+  use this as fallback voice
+- Otherwise find the first matching voice by current `navigator.language`
+- Otherwise use the first voice in the Array
+
+Note: This fallback voice is not overridden by `EasySpeech.defaults()`, your
+default voice will be used in favor but the fallback voice will always be there
+in case no voice is found when calling `EasySpeech.speak()`
+
 ### Speak a voice
 
+This is as easy as it gets:
 
+```javascript
+await EasySpeech.speak({
+  text: 'Hello, world!',
+  voice: myLangVoice, // optional, will use a default or fallback
+  pitch: 1,
+  rate: 1,
+  volume: 1,
+  // there are more events, see the API for supported events
+  boundary: e => console.debug('boundary reached')
+})
+```
+
+The Promise will automatically resolve when the speaking ends or rejects when
+an error occurred. You can additionally attach these event listeners if you like
+or use `EasySpeech.on` to attach default listeners to every time you call 
+`EasySpeech.speak`.
 
 ## API
 
 There is a full API documentation available: [api docs](./API.md)
+
+## Contribution and development
+
+Every contribution is welcomed, please open issues if anything is not working
+as expected.
+
+If you intend to contribute code, please read the 
+[guidelines on contributing](./CONTRIBUTING.md).
 
 ## Resources
 
