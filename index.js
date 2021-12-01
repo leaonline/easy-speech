@@ -122,12 +122,12 @@ const detectFeatures = () => {
     features[feature] = detect(feature)
   })
 
-  features.onvoiceschanged = !!features.speechSynthesis && 'onvoiceschanged' in features.speechSynthesis
-
+  features.onvoiceschanged = !!features.speechSynthesis && features.speechSynthesis['onvoiceschanged']
   const hasUtterance = !!features.speechSynthesisUtterance?.prototype
+
   utteranceEvents.forEach(event => {
     const name = `on${event}`
-    features[name] = hasUtterance && name in features.speechSynthesisUtterance.prototype
+    features[name] = hasUtterance && features.speechSynthesisUtterance.prototype[name]
   })
 
   return features
