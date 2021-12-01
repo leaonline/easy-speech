@@ -5,6 +5,7 @@
 - load default voices when exist or use fallbacks when not
 - coverage improved to ~98%
 - fix broken feature detected by using bracket notation in favour of 'in' keyword
+- improved detection and additional voiceschanged fallback  when onvoiceschanged does not exist
 
 **1.0.0**
 - initial implementation

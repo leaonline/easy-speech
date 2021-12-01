@@ -122,16 +122,19 @@ const detectFeatures = () => {
     features[feature] = detect(feature)
   })
 
-  features.onvoiceschanged = !!features.speechSynthesis && features.speechSynthesis['onvoiceschanged']
-  const hasUtterance = !!features.speechSynthesisUtterance?.prototype
+  features.onvoiceschanged = hasProperty(features.speechSynthesis, 'onvoiceschanged')
+
+  const hasUtterance = hasProperty(features.speechSynthesisUtterance, 'prototype')
 
   utteranceEvents.forEach(event => {
     const name = `on${event}`
-    features[name] = hasUtterance && features.speechSynthesisUtterance.prototype[name]
+    features[name] = hasUtterance && hasProperty(features.speechSynthesisUtterance.prototype, name)
   })
 
   return features
 }
+
+const hasProperty = (target = {}, prop) => Object.hasOwnProperty.call(target, prop) || prop in target || !!target[prop]
 
 /**
  * Common prefixes for browsers that tend to implement their custom names for
@@ -160,6 +163,7 @@ const detect = baseName => {
   const found = [baseName, capitalBaseName]
     .concat(baseNameWithPrefixes)
     .find(inGlobalScope)
+
   return scope[found]
 }
 
@@ -169,7 +173,7 @@ const detect = baseName => {
  * @param name
  * @return {boolean}
  */
-const inGlobalScope = name => !!scope[name]
+const inGlobalScope = name => scope[name]
 
 /**
  * Returns a shallow copy of the current internal status. Depending of the
@@ -264,6 +268,8 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
     // so we declare it at the top to make sure the interval is always cleared
     // when we exit the Promise via fail / complete
     let timer
+    let voicesChangedListener
+    let completeCalled = false
 
     const fail = (errorMessage) => {
       status(`init: failed (${errorMessage})`)
@@ -273,9 +279,23 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
     }
 
     const complete = () => {
+      // avoid race-conditions between listeners and timeout
+      if (completeCalled) { return }
       status('init: complete')
-      clearInterval(timer)
+
+      // set flags immediately
+      completeCalled = true
       internal.initialized = true
+
+      // cleanup events and timer
+      clearInterval(timer)
+      speechSynthesis.onvoiceschanged = null
+
+      if (voicesChangedListener) {
+        speechSynthesis.removeEventListener('voiceschanged', voicesChangedListener)
+      }
+
+      // all done
       return resolve(true)
     }
 
@@ -305,7 +325,7 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
 
         // otherwise let's stick to the first one we can find by locale
         if (!internal.defaultVoice) {
-          const language = scope.navigator?.language || ''
+          const language = (scope.navigator || {}).language || ''
           const lang = language.split('-')[0]
 
           internal.defaultVoice = voices.find(v => {
@@ -359,9 +379,20 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
         return loadViaTimeout()
       }
     } else {
+      // this is a very problematic case, since we don't really know, whether
+      // this event will fire at all, so we need to setup both a listener AND
+      // run the timeout and make sure on of them "wins"
+      // affected browsers may be: MacOS Safari
+      if (hasProperty(speechSynthesis, 'addEventListener')) {
+        voicesChangedListener = () => {
+          if (voicesLoaded()) { return complete() }
+        }
+
+        speechSynthesis.addEventListener('voiceschanged', voicesChangedListener)
+      }
+
       // for all browser not supporting onveoiceschanged we start a timer
       // until we reach a certain timeout and try to get the voices
-
       loadViaTimeout()
     }
   })
@@ -616,8 +647,8 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
       resolve(endEvent)
     })
 
-    utterance.addEventListener('error', errorEvent => {
-      status(`speak failed: ${errorEvent?.message}`)
+    utterance.addEventListener('error', (errorEvent = {}) => {
+      status(`speak failed: ${errorEvent.message}`)
       clearTimeout(timeoutResumeInfinity)
       reject(errorEvent)
     })

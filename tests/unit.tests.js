@@ -1,7 +1,12 @@
 /* eslint-env mocha */
 import EasySpeech from '../index.js'
 import { expect } from 'chai'
-import { randomId, clearScope, initScope, createUtteranceClass } from './test-helpers.js'
+import {
+  randomId,
+  clearScope,
+  initScope,
+  createUtteranceClass
+} from './test-helpers.js'
 
 describe('unit tests', function () {
   afterEach(function () {
@@ -298,6 +303,73 @@ describe('unit tests', function () {
       setTimeout(() => {
         speechSynthesis.getVoices = () => [{ id }]
         speechSynthesis.onvoiceschanged()
+      }, 500)
+    })
+    it('completes when loaded voices is available in voiceschanged', function (done) {
+      const SpeechSynthesisUtterance = createUtteranceClass()
+      const speechSynthesis = {
+        getVoices: () => null,
+        addEventListener: (name, fn) => {
+          expect(name).to.equal('voiceschanged')
+          listener = fn
+          listenerAdded = true
+          console.debug('voiceschanged added')
+        },
+        removeEventListener: (name, fn) => {
+          expect(name).to.equal('voiceschanged')
+          expect(fn).to.equal(listener)
+          listener = null
+          listenerRemoved = true
+        }
+      }
+
+      let listener = null
+      let listenerAdded = false
+      let listenerRemoved = false
+
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+
+      EasySpeech.init({ maxTimeout: 1500, interval: 1000 })
+        .catch(e => done(e))
+        .then(initialized => {
+          expect(initialized).to.equal(true)
+          expect(EasySpeech.status()).to.deep.equal({
+            status: 'init: complete',
+            initialized: true,
+            speechSynthesis: speechSynthesis,
+            speechSynthesisUtterance: SpeechSynthesisUtterance,
+            speechSynthesisVoice: undefined,
+            speechSynthesisEvent: undefined,
+            speechSynthesisErrorEvent: undefined,
+            voices: [{ id }],
+            defaultVoice: { id },
+            defaults: {
+              pitch: 1,
+              rate: 1,
+              volume: 1,
+              voice: null
+            },
+            handlers: {},
+            onboundary: false,
+            onend: true, // set in prototype
+            onerror: false,
+            onmark: false,
+            onpause: false,
+            onresume: false,
+            onstart: false,
+            onvoiceschanged: false
+          })
+          expect(listener).to.equal(null)
+          expect(listenerAdded).to.equal(true)
+          expect(listenerRemoved).to.equal(true)
+          done()
+        })
+
+      const id = randomId()
+      setTimeout(() => {
+        speechSynthesis.getVoices = () => [{ id }]
+        listener()
       }, 500)
     })
   })
