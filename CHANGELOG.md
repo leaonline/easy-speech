@@ -1,4 +1,4 @@
-**next**
+**1.1.0**
 - coverage only includes main file
 - fix issue in docs/pages where first selected voice is ignored
 - debug utterance properties when speaking
@@ -6,6 +6,7 @@
 - coverage improved to ~98%
 - fix broken feature detected by using bracket notation in favour of 'in' keyword
 - improved detection and additional voiceschanged fallback  when onvoiceschanged does not exist
+- remove optional chaining as some browsers still have problems with it**
 
 **1.0.0**
 - initial implementation
