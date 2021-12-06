@@ -4,6 +4,9 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Test suite](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml)
 [![CodeQL Semantic Analysis](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml)
+![npm](https://img.shields.io/npm/v/easy-speech)
+![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
 
 
 Cross browser Speech Synthesis
