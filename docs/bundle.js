@@ -55,6 +55,8 @@ const internal = {
   status: 'created'
 };
 
+const patches = {};
+
 /*******************************************************************************
  *
  * AVAILABLE WITHOUT INIT
@@ -131,10 +133,20 @@ const detectFeatures = () => {
     features[name] = hasUtterance && hasProperty(features.speechSynthesisUtterance.prototype, name);
   });
 
+  // not published to the outside
+  patches.skipInfinity = skipInfinity();
+
   return features
 };
 
+/** @private **/
 const hasProperty = (target = {}, prop) => Object.hasOwnProperty.call(target, prop) || prop in target || !!target[prop];
+
+/** @private **/
+const skipInfinity = () => {
+  const ua = (scope.navigator || {}).userAgent || '';
+  return /android/i.test(ua)
+};
 
 /**
  * Common prefixes for browsers that tend to implement their custom names for
@@ -634,9 +646,9 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
     // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
     //
     // XXX: this apparently works only on chrome desktop, while it breaks chrome
-    // mobile (android), which is why we skip this on these devices
+    // mobile (android), so we need to detect chrome desktop
     utterance.addEventListener('start', () => {
-      if (internal.speechSynthesisVoice) {
+      if (patches.skipInfinity !== true) {
         resumeInfinity(utterance);
       }
     });
@@ -680,14 +692,15 @@ let timeoutResumeInfinity;
  * @param target
  */
 function resumeInfinity (target) {
+  // prevent memory-leak in case utterance is deleted, while this is ongoing
   if (!target && timeoutResumeInfinity) {
     debug('force-clear timeout');
-    return clearTimeout(timeoutResumeInfinity)
+    return scope.clearTimeout(timeoutResumeInfinity)
   }
 
   internal.speechSynthesis.pause();
   internal.speechSynthesis.resume();
-  timeoutResumeInfinity = setTimeout(function () {
+  timeoutResumeInfinity = scope.setTimeout(function () {
     resumeInfinity(target);
   }, 5000);
 }

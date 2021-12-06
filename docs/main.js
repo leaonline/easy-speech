@@ -149,7 +149,10 @@ async function populateVoices (initialized) {
       .sort((a, b) => a.name.localeCompare(b.name))
 
     filteredVoices.forEach((voice, index) => {
-      const option = textNode(voice.name, 'option')
+      const service = voice.localService ? 'local' : 'remote'
+      const isDefault = voice.default ? '[DEFAULT]' : ''
+      const voiceName = `${isDefault}${voice.name} - ${voice.voiceURI} (${service})`
+      const option = textNode(voiceName, 'option')
       option.setAttribute('value', index.toString(10))
       inputs.voice.appendChild(option)
     })
