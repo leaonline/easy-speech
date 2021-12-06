@@ -1,3 +1,7 @@
+**1.1.1**
+- fixed `resumeInfinity` timer on android browsers, because on Android
+  `speechSynthesis.pause()` has the same effect as `cancel`
+
 **1.1.0**
 - coverage only includes main file
 - fix issue in docs/pages where first selected voice is ignored
