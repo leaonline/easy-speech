@@ -396,6 +396,8 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
       // run the timeout and make sure on of them "wins"
       // affected browsers may be: MacOS Safari
       if (hasProperty(speechSynthesis, 'addEventListener')) {
+        status('init: voices (addEventListener)')
+
         voicesChangedListener = () => {
           if (voicesLoaded()) { return complete() }
         }
