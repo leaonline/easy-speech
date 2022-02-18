@@ -135,6 +135,7 @@ const detectFeatures = () => {
 
   // not published to the outside
   patches.isAndroid = isAndroid()
+  patches.isFirefox = isFirefox()
 
   return features
 }
@@ -147,6 +148,9 @@ const isAndroid = () => {
   const ua = (scope.navigator || {}).userAgent || ''
   return /android/i.test(ua)
 }
+
+/** @private **/
+const isFirefox = () => typeof scope.InstallTrigger !== 'undefined'
 
 /**
  * Common prefixes for browsers that tend to implement their custom names for
@@ -649,11 +653,14 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
     //
     // XXX: this apparently works only on chrome desktop, while it breaks chrome
     // mobile (android), so we need to detect chrome desktop
+    //
+    // XXX: resumeInfinity breaks on firefox macOs so we need to avoid it there
+    // as well. Since we don't need it in FF anyway, we can safely skip there
     utterance.addEventListener('start', () => {
       patches.paused = false
       patches.speaking = true
 
-      if (patches.isAndroid !== true) {
+      if (!patches.isFirefox && patches.isAndroid !== true) {
         resumeInfinity(utterance)
       }
     })
