@@ -134,7 +134,8 @@ const detectFeatures = () => {
   });
 
   // not published to the outside
-  patches.skipInfinity = skipInfinity();
+  patches.isAndroid = isAndroid();
+  patches.isFirefox = isFirefox();
 
   return features
 };
@@ -143,10 +144,13 @@ const detectFeatures = () => {
 const hasProperty = (target = {}, prop) => Object.hasOwnProperty.call(target, prop) || prop in target || !!target[prop];
 
 /** @private **/
-const skipInfinity = () => {
+const isAndroid = () => {
   const ua = (scope.navigator || {}).userAgent || '';
   return /android/i.test(ua)
 };
+
+/** @private **/
+const isFirefox = () => typeof scope.InstallTrigger !== 'undefined';
 
 /**
  * Common prefixes for browsers that tend to implement their custom names for
@@ -396,6 +400,8 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
       // run the timeout and make sure on of them "wins"
       // affected browsers may be: MacOS Safari
       if (hasProperty(speechSynthesis, 'addEventListener')) {
+        status('init: voices (addEventListener)');
+
         voicesChangedListener = () => {
           if (voicesLoaded()) { return complete() }
         };
@@ -647,20 +653,30 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
     //
     // XXX: this apparently works only on chrome desktop, while it breaks chrome
     // mobile (android), so we need to detect chrome desktop
+    //
+    // XXX: resumeInfinity breaks on firefox macOs so we need to avoid it there
+    // as well. Since we don't need it in FF anyway, we can safely skip there
     utterance.addEventListener('start', () => {
-      if (patches.skipInfinity !== true) {
+      patches.paused = false;
+      patches.speaking = true;
+
+      if (!patches.isFirefox && patches.isAndroid !== true) {
         resumeInfinity(utterance);
       }
     });
 
     utterance.addEventListener('end', endEvent => {
       status('speak complete');
+      patches.paused = false;
+      patches.speaking = false;
       clearTimeout(timeoutResumeInfinity);
       resolve(endEvent);
     });
 
     utterance.addEventListener('error', (errorEvent = {}) => {
       status(`speak failed: ${errorEvent.message}`);
+      patches.paused = false;
+      patches.speaking = false;
       clearTimeout(timeoutResumeInfinity);
       reject(errorEvent);
     });
@@ -698,8 +714,19 @@ function resumeInfinity (target) {
     return scope.clearTimeout(timeoutResumeInfinity)
   }
 
-  internal.speechSynthesis.pause();
-  internal.speechSynthesis.resume();
+  // only execute on speaking utterances, otherwise paused
+  // utterances will get resumed, thus breaking user experience
+  // include internal patching, since some systems have problems with
+  // pause/resume and updateing the internal state on speechSynthesis
+  const { paused, speaking } = internal.speechSynthesis;
+  const isSpeaking = speaking || patches.speaking;
+  const isPaused = paused || patches.paused;
+  debug(`resumeInfinity isSpeaking=${isSpeaking} isPaused=${isPaused}`);
+
+  if (isSpeaking && !isPaused) {
+    internal.speechSynthesis.pause();
+    internal.speechSynthesis.resume();
+  }
   timeoutResumeInfinity = scope.setTimeout(function () {
     resumeInfinity(target);
   }, 5000);
@@ -712,6 +739,8 @@ EasySpeech.cancel = () => {
   ensureInit();
   status('cancelling');
   internal.speechSynthesis.cancel();
+  patches.paused = false;
+  patches.speaking = false;
 };
 
 /**
@@ -720,6 +749,9 @@ EasySpeech.cancel = () => {
 EasySpeech.resume = () => {
   ensureInit();
   status('resuming');
+
+  patches.paused = false;
+  patches.speaking = true;
   internal.speechSynthesis.resume();
 };
 
@@ -729,7 +761,19 @@ EasySpeech.resume = () => {
 EasySpeech.pause = () => {
   ensureInit();
   status('pausing');
+
+  // exec pause on Android causes speech to end but not to fire end-event
+  // se we simply do it manually instead of pausing
+  if (patches.isAndroid) {
+    debug('patch pause on Android with cancel');
+    return internal.speechSynthesis.cancel()
+  }
+
   internal.speechSynthesis.pause();
+  // in some cases, pause does not update the internal state,
+  // so we need to update it manually using an own state
+  patches.paused = true;
+  patches.speaking = false;
 };
 
 /**
