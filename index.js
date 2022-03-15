@@ -136,6 +136,7 @@ const detectFeatures = () => {
   // not published to the outside
   patches.isAndroid = isAndroid()
   patches.isFirefox = isFirefox()
+  patches.isSafari = isSafari()
 
   return features
 }
@@ -151,6 +152,7 @@ const isAndroid = () => {
 
 /** @private **/
 const isFirefox = () => typeof scope.InstallTrigger !== 'undefined'
+const isSafari = () => typeof scope.GestureEvent !== 'undefined'
 
 /**
  * Common prefixes for browsers that tend to implement their custom names for
@@ -656,11 +658,14 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
     //
     // XXX: resumeInfinity breaks on firefox macOs so we need to avoid it there
     // as well. Since we don't need it in FF anyway, we can safely skip there
+    //
+    // XXX: resumeInfinity is also incompatible with older safari ios versions
+    // so we skip it on safari, too.
     utterance.addEventListener('start', () => {
       patches.paused = false
       patches.speaking = true
 
-      if (!patches.isFirefox && patches.isAndroid !== true) {
+      if (!patches.isFirefox && !patches.isSafari && patches.isAndroid !== true) {
         resumeInfinity(utterance)
       }
     })
