@@ -138,6 +138,10 @@ const detectFeatures = () => {
   patches.isFirefox = isFirefox()
   patches.isSafari = isSafari()
 
+  debug('is android', !!patches.isAndroid)
+  debug('is firefox', !!patches.isFirefox)
+  debug('is safari', !!patches.isSafari)
+
   return features
 }
 
