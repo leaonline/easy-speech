@@ -425,10 +425,11 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
 /**
  * Placed as first line in functions that require `EasySpeech.init` before they
  * can run.
+ * @param {boolean=} force set to true to force-skip check
  * @private
  */
-const ensureInit = () => {
-  if (!internal.initialized) {
+const ensureInit = ({ force } = {}) => {
+  if (!force && !internal.initialized) {
     throw new Error('EasySpeech: not initialized. Run EasySpeech.init() first')
   }
 };
@@ -552,10 +553,9 @@ EasySpeech.defaults = (options) => {
  * @return {*|SpeechSynthesisVoice|{}}
  */
 const getCurrentVoice = voice => voice ||
-  internal.defaults.voice ||
+  internal.defaults?.voice ||
   internal.defaultVoice ||
-  internal.voices[0] ||
-  {};
+  internal.voices?.[0];
 
 /**
  * Creates a new `SpeechSynthesisUtterance` instance
@@ -593,6 +593,7 @@ const createUtterance = text => {
  * @param {number=} options.pitch - Optional pitch value >= 0 and <= 2
  * @param {number=} options.rate - Optional rate value >= 0.1 and <= 10
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
+ * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -608,8 +609,8 @@ const createUtterance = text => {
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
  * @reject {SpeechSynthesisEvent} rejects using the `error` event
  */
-EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
-  ensureInit();
+EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, ...handlers }) => {
+  ensureInit({ force });
 
   if (!validate.text(text)) {
     throw new Error('EasySpeech: at least some valid text is required to speak')
@@ -622,7 +623,7 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
       return value
     }
 
-    return internal.defaults && internal.defaults[name]
+    return internal.defaults?.[name]
   };
 
   return new Promise((resolve, reject) => {
@@ -630,9 +631,17 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
 
     const utterance = createUtterance(text);
     const currentVoice = getCurrentVoice(voice);
-    utterance.voice = currentVoice;
-    utterance.lang = currentVoice.lang;
-    utterance.voiceURI = currentVoice.voiceURI;
+
+    // XXX: if we force-speak, we may not get a current voice!
+    // This may occur when the browser won't load voices but
+    // provides SpeechSynth and SpeechSynthUtterance.
+    // We then might at least try to speak something with defaults
+    if (currentVoice) {
+      utterance.voice = currentVoice;
+      utterance.lang = currentVoice.lang;
+      utterance.voiceURI = currentVoice.voiceURI;
+    }
+
     utterance.text = text;
     utterance.pitch = getValue({ pitch });
     utterance.rate = getValue({ rate });
@@ -646,7 +655,7 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
         utterance.addEventListener(name, fn);
       }
 
-      if (internal.handlers[name]) {
+      if (internal.handlers?.[name]) {
         utterance.addEventListener(name, internal.handlers[name]);
       }
     });
@@ -702,7 +711,7 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, ...handlers }) => {
 
 /** @private **/
 const debugUtterance = ({ voice, pitch, rate, volume }) => {
-  debug(`utterance: voice=${voice.name} volume=${volume} rate=${rate} pitch=${pitch}`);
+  debug(`utterance: voice=${voice?.name} volume=${volume} rate=${rate} pitch=${pitch}`);
 };
 
 /**

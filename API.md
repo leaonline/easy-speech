@@ -263,6 +263,7 @@ used as fallback.
 | [options.pitch] | <code>number</code> | Optional pitch value >= 0 and <= 2 |
 | [options.rate] | <code>number</code> | Optional rate value >= 0.1 and <= 10 |
 | [options.volume] | <code>number</code> | Optional volume value >= 0 and <= 1 |
+| [options.force] | <code>boolean</code> | Optional set to true to force speaking, no matter the internal state |
 | [handlers] | <code>object</code> | optional additional local handlers, can be   directly added as top-level properties of the options |
 | [handlers.boundary] | <code>function</code> | optional, event handler |
 | [handlers.end] | <code>function</code> | optional, event handler |
