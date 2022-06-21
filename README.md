@@ -9,7 +9,7 @@
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
 
 
-Cross browser Speech Synthesis
+Cross browser Speech Synthesis; no dependencies.
 
 This project was created, because it's always a struggle to get the synthesis
 part of `Web Speech API` running on most major browsers.
