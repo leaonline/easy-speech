@@ -534,6 +534,45 @@ describe('unit tests', function () {
           await EasySpeech.speak({ text })
         })
     })
+    it('allows to force-speak in case voices are not loaded but functionality is supported', async function () {
+      let reached = false
+      const text = 'hello'
+      const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
+        constructor (text) {
+          this.text = text
+          this.listeners = {}
+          this.onend = null
+          this.onstart = null
+          this.onerror = null
+        }
+
+        addEventListener (name, fn) {
+          if (name === 'error' && !SpeechSynthesisUtterance.allowError) return
+          this.listeners[name] = this.listeners[name] || []
+          this.listeners[name].push(fn)
+        }
+
+        fire () {
+          Object.values(this.listeners).forEach(list => list.forEach(fn => fn()))
+        }
+      }
+      const speechSynthesis = {
+        getVoices: () => [{}],
+        speak: function (u) {
+          expect(u.text).to.equal(text)
+          reached = true
+          setTimeout(() => u.fire(), 10)
+        },
+        pause: () => {},
+        resume: () => {},
+        cancel: () => {}
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      EasySpeech.init().catch(e => expect.fail(e)) // may not be finished, simulate pending
+      await EasySpeech.speak({ text, force: true })
+      expect(reached).to.equal(true)
+    })
     it('uses voice intervals to handle longer texts', function (done) {
       const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
         constructor (text) {
