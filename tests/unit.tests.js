@@ -184,7 +184,7 @@ describe('unit tests', function () {
       expect(EasySpeech.status()).to.deep.equal({
         status: 'init: complete',
         initialized: true,
-        speechSynthesis: speechSynthesis,
+        speechSynthesis,
         speechSynthesisUtterance: SpeechSynthesisUtterance,
         speechSynthesisVoice: undefined,
         speechSynthesisEvent: undefined,
@@ -225,7 +225,7 @@ describe('unit tests', function () {
           expect(EasySpeech.status()).to.deep.equal({
             status: 'init: complete',
             initialized: true,
-            speechSynthesis: speechSynthesis,
+            speechSynthesis,
             speechSynthesisUtterance: SpeechSynthesisUtterance,
             speechSynthesisVoice: undefined,
             speechSynthesisEvent: undefined,
@@ -273,7 +273,7 @@ describe('unit tests', function () {
           expect(EasySpeech.status()).to.deep.equal({
             status: 'init: complete',
             initialized: true,
-            speechSynthesis: speechSynthesis,
+            speechSynthesis,
             speechSynthesisUtterance: SpeechSynthesisUtterance,
             speechSynthesisVoice: undefined,
             speechSynthesisEvent: undefined,
@@ -337,7 +337,7 @@ describe('unit tests', function () {
           expect(EasySpeech.status()).to.deep.equal({
             status: 'init: complete',
             initialized: true,
-            speechSynthesis: speechSynthesis,
+            speechSynthesis,
             speechSynthesisUtterance: SpeechSynthesisUtterance,
             speechSynthesisVoice: undefined,
             speechSynthesisEvent: undefined,
