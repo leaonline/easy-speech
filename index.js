@@ -400,6 +400,16 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
         // the timeout-based method here.
         return loadViaTimeout()
       }
+
+      // xxx: there is an edge-case where browser provide onvoiceschanged,
+      // but they never load the voices, so init would never complete
+      // in such case we need to fail after maxTimeout
+      setTimeout(() => {
+        if (voicesLoaded()) {
+          return complete()
+        }
+        return fail('browser has no voices (timeout)')
+      }, maxTimeout)
     } else {
       // this is a very problematic case, since we don't really know, whether
       // this event will fire at all, so we need to setup both a listener AND
