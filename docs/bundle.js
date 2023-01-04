@@ -29,7 +29,7 @@ const EasySpeech = {};
  * on what's available with window as priority, since Browsers are main target.
  * @private
  */
-const scope = globalThis;
+const scope = typeof globalThis === 'undefined' ? window : globalThis;
 
 /**
  * @private
@@ -135,7 +135,7 @@ const detectFeatures = () => {
 
   // not published to the outside
   patches.isAndroid = isAndroid();
-  patches.isFirefox = isFirefox();
+  patches.isFirefox = isFirefox() || isKaiOS();
   patches.isSafari = isSafari();
 
   debug(`is android: ${!!patches.isAndroid}`);
@@ -155,6 +155,10 @@ const isAndroid = () => {
 };
 
 /** @private **/
+const isKaiOS = () => {
+  const ua = (scope.navigator || {}).userAgent || '';
+  return /kaios/i.test(ua)
+};
 const isFirefox = () => typeof scope.InstallTrigger !== 'undefined';
 const isSafari = () => typeof scope.GestureEvent !== 'undefined';
 
