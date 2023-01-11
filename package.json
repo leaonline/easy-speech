@@ -1,6 +1,6 @@
 {
   "name": "easy-speech",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Cross browser Speech Synthesis",
   "type": "module",
   "main": "index.js",
