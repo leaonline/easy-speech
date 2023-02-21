@@ -12,7 +12,9 @@
 name: "CodeQL Semantic Analysis"
 
 on:
-  push: # all pushes
+  push:
+    branches:
+      - master
   pull_request: # all PR
   schedule:
     - cron: '0 2 * * *' # every night at 2am
@@ -36,7 +38,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
