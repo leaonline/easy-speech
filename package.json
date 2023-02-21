@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/EasySpeech.cjs.js",
   "browser": "dist/EasySpeech.iife.js",
-  "exports": "dist/EasySpeech.js",
+  "exports": "./dist/EasySpeech.js",
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
     "test-debug": "NODE_ENV=test ./node_modules/.bin/mocha  --inspect --debug-brk 'tests/**/*.tests.js'",
@@ -13,7 +13,7 @@
     "lint": "standard . | snazzy",
     "lint:fix": "standard . --fix | snazzy",
     "prepublish": "npm run lint && npm run test && npm run build && npm run build:docs",
-    "build:docs": "jsdoc2md index.js > API.md",
+    "build:docs": "jsdoc2md src/EasySpeech.js > API.md",
     "build:demo": "rollup --config rollup.demo.config.js",
     "build": "rollup --config rollup.dist.config.js"
   },
