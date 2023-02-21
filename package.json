@@ -11,9 +11,10 @@
     "test:coverage": "NODE_ENV=test c8 --include=index.js --reporter=html --reporter=text ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
     "lint": "standard . | snazzy",
     "lint:fix": "standard . --fix | snazzy",
-    "docs:api": "jsdoc2md index.js > API.md",
-    "docs:html": "rollup index.js --format iife --name \"EasySpeech\" --file docs/bundle.js --compact --no-sourcemap",
-    "prepublish": "npm run lint && npm run test && npm run docs:api && npm run docs:html"
+    "prepublish": "npm run lint && npm run test && npm run docs:api && npm run docs:html",
+    "build:docs": "jsdoc2md index.js > API.md",
+    "build:demo": "rollup --config rollup.demo.config.js",
+    "build": "rollup --config rollup.config.js"
   },
   "repository": {
     "type": "git",
@@ -33,11 +34,16 @@
   },
   "homepage": "https://github.com/jankapunkt/easy-speech#readme",
   "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
     "c8": "^7.11.3",
     "chai": "^4.3.4",
     "jsdoc-to-markdown": "^8.0.0",
     "mocha": "^10.0.0",
     "rollup": "^3.1.0",
+    "rollup-plugin-terser": "^7.0.2",
     "sinon": "^15.0.0",
     "snazzy": "^9.0.0",
     "standard": "17.0.0"
