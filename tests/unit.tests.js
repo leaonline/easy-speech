@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import EasySpeech from '../index.js'
+import EasySpeech from '../src/EasySpeech.js'
 import { expect } from 'chai'
 import {
   randomId,

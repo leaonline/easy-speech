@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import { terser } from 'rollup-plugin-terser'
 
 export default {
-  input: 'lib/demo.js',
+  input: 'src/demo.js',
   output: {
     file: 'docs/demo.js',
     format: 'iife',

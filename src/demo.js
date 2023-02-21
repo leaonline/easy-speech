@@ -1,4 +1,4 @@
-import EasySpeech from '../index.js'
+import EasySpeech from './EasySpeech.js'
 
 document.body.onload = async () => {
   createLog()
