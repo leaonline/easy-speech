@@ -1,3 +1,11 @@
+**2.0.0**
+- Added multiple build targets
+- Potentially breaking for ci, since build output is
+  now in `/dist` folder
+- Npm package also links to respective files in `/dist`
+  instead of `index.js`, which is now moved to `/src` folder
+- `/docs` are now compatible with older and exotic browsers
+
 **1.2.0**
 - tests: updated
 - fix(core): init() prevents infinite pending, in case onvoiceschanged exists but never fires
