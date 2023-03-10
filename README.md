@@ -25,6 +25,29 @@ Install from npm via
 $ npm install easy-speech
 ``` 
 
+You can also use the various builds for different targets, see the `dist` folder:
+
+- `/dist/EasySpeech.js` - ESM
+- `/dist/EasySpeech.cjs.js` - CommonJs 
+- `/dist/EasySpeech.es5.js` - Legacy node compatible
+- `/dist/EasySpeech.iife.js` - Legacy compatible build, works even with older 
+  or exotic browsers, as long as they support Promises (PRs welcome to transform 
+  to callbacks!)
+
+You can use them via CDN:
+
+```html
+<!-- esm -->
+<script type="module">
+  import easySpeech from 'https://cdn.jsdelivr.net/npm/easy-speech/+esm'
+</script>
+```
+
+```html
+<!-- classic -->
+<script src="https://cdn.jsdelivr.net/npm/easy-speech/dist/EasySpeech.iife.js"></script>
+```
+
 ## Usage
 
 Import `EasySpeech` and first, detect, if your browser is capable of tts (text
