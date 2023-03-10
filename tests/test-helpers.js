@@ -1,4 +1,4 @@
-import EasySpeech from '../index.js'
+import EasySpeech from '../src/EasySpeech.js'
 
 export const randomId = (length = 1) => (Math.random() * length).toString(16)
 export const clearScope = () => {

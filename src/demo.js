@@ -1,4 +1,5 @@
-/* global document EasySpeech */
+import EasySpeech from './EasySpeech.js'
+
 document.body.onload = async () => {
   createLog()
   appendFeatures(EasySpeech.detect())
