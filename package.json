@@ -38,7 +38,7 @@
     "@babel/core": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
     "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-commonjs": "^25.0.0",
     "c8": "^7.11.3",
     "chai": "^4.3.4",
     "jsdoc-to-markdown": "^8.0.0",
