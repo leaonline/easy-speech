@@ -271,6 +271,9 @@ const status = s => {
  * Note: if once initialized you can't re-init (will skip and resolve to
  * `false`) unless you run `EasySpeech.reset()`.
  *
+ * @param maxTimeout {number}[5000] the maximum timeout to wait for voices in ms
+ * @param interval {number}[250] the interval in ms to check for voices
+ * @param quiet {boolean=} prevent rejection on errors, e.g. if no voices
  * @return {Promise<Boolean>}
  * @fulfil {Boolean} true, if initialized, false, if skipped (because already
  *   initialized)
@@ -284,7 +287,7 @@ const status = s => {
  *      any voices embedded (example: Chromium on *buntu os')
  */
 
-EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
+EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet } = {}) {
   return new Promise((resolve, reject) => {
     if (internal.initialized) { return resolve(false) }
     EasySpeech.reset()
@@ -301,7 +304,11 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
       status(`init: failed (${errorMessage})`)
       clearInterval(timer)
       internal.initialized = false
-      return reject(new Error(`EasySpeech: ${errorMessage}`))
+
+      // we have the option to fail quiet here
+      return quiet
+        ? resolve(false)
+        : reject(new Error(`EasySpeech: ${errorMessage}`))
     }
 
     const complete = () => {

@@ -168,6 +168,11 @@ describe('unit tests', function () {
         expect(e.message).to.equal('EasySpeech: browser has no voices (timeout)')
       }
     })
+    it('does not throw if quiet argument is passed', async function () {
+      EasySpeech.reset()
+      const init = await EasySpeech.init({ quiet: true })
+      expect(init).to.equal(false)
+    })
     it('completes when loaded voices is available', async function () {
       const SpeechSynthesisUtterance = createUtteranceClass()
       const id = randomId()
