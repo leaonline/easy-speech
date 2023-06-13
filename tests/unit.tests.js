@@ -168,6 +168,11 @@ describe('unit tests', function () {
         expect(e.message).to.equal('EasySpeech: browser has no voices (timeout)')
       }
     })
+    it('does not throw if quiet argument is passed', async function () {
+      EasySpeech.reset()
+      const init = await EasySpeech.init({ quiet: true })
+      expect(init).to.equal(false)
+    })
     it('completes when loaded voices is available', async function () {
       const SpeechSynthesisUtterance = createUtteranceClass()
       const id = randomId()
@@ -573,7 +578,7 @@ describe('unit tests', function () {
       await EasySpeech.speak({ text, force: true })
       expect(reached).to.equal(true)
     })
-    it('uses voice intervals to handle longer texts', function (done) {
+    it('uses voice intervals to handle longer texts (resumeInfinity)', function (done) {
       const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
         constructor (text) {
           this.text = text
@@ -619,6 +624,106 @@ describe('unit tests', function () {
         .catch(e => done(e))
         .then(async () => {
           await EasySpeech.speak({ text })
+        })
+    })
+    it('allows to force-prevent resumeInfinite', function (done) {
+      const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
+        constructor (text) {
+          this.text = text
+        }
+
+        addEventListener (name, fn) {
+          if (name === 'start') this.listener = fn
+        }
+      }
+
+      const text = randomId()
+      let pauseCalled = false
+      let resumeCalled = false
+
+      const speechSynthesis = {
+        getVoices: () => [{}],
+        speak: function (u) {
+          u.listener() // start event
+          expect(u.text).to.equal(text)
+          setTimeout(() => {
+            expect(pauseCalled).to.equal(false)
+            expect(resumeCalled).to.equal(false)
+            done()
+          }, 1500)
+        },
+        cancel: () => {},
+        pause: () => {
+          pauseCalled = true
+        },
+        resume: () => {
+          resumeCalled = true
+        }
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      globalThis.SpeechSynthesisVoice = function (lang, name, voiceURI) {
+        this.lang = lang
+        this.name = name
+        this.voiceURI = voiceURI
+      }
+
+      EasySpeech.init()
+        .catch(e => done(e))
+        .then(async () => {
+          await EasySpeech.speak({ text, infiniteResume: false })
+        })
+    })
+    it('allows to force-include resumeInfinite', function (done) {
+      const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
+        constructor (text) {
+          this.text = text
+        }
+
+        addEventListener (name, fn) {
+          if (name === 'start') this.listener = fn
+        }
+      }
+
+      // simulate safari
+      globalThis.GestureEvent = () => {}
+
+      const text = randomId()
+      let pauseCalled = false
+      let resumeCalled = false
+
+      const speechSynthesis = {
+        getVoices: () => [{}],
+        speak: function (u) {
+          u.listener() // start event
+          expect(u.text).to.equal(text)
+          expect(pauseCalled).to.equal(true)
+          expect(resumeCalled).to.equal(true)
+
+          // cleanup fake-feature
+          delete globalThis.GestureEvent
+          done()
+        },
+        cancel: () => {},
+        pause: () => {
+          pauseCalled = true
+        },
+        resume: () => {
+          resumeCalled = true
+        }
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      globalThis.SpeechSynthesisVoice = function (lang, name, voiceURI) {
+        this.lang = lang
+        this.name = name
+        this.voiceURI = voiceURI
+      }
+
+      EasySpeech.init()
+        .catch(e => done(e))
+        .then(async () => {
+          await EasySpeech.speak({ text, infiniteResume: true })
         })
     })
     it('allows to override defaults', function (done) {

@@ -8,7 +8,7 @@
             * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
             * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
             * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
-            * [.init()](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
+            * [.init(maxTimeout, interval, [quiet])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
             * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
             * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
             * [.defaults([options])](#module_EasySpeech--module.exports..EasySpeech.defaults) ⇒ <code>object</code>
@@ -62,7 +62,7 @@ const example = async () => {
     * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
     * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
     * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
-    * [.init()](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
+    * [.init(maxTimeout, interval, [quiet])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
     * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
     * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
     * [.defaults([options])](#module_EasySpeech--module.exports..EasySpeech.defaults) ⇒ <code>object</code>
@@ -161,7 +161,7 @@ EasySpeech.status()
 ```
 <a name="module_EasySpeech--module.exports..EasySpeech.init"></a>
 
-##### EasySpeech.init() ⇒ <code>Promise.&lt;Boolean&gt;</code>
+##### EasySpeech.init(maxTimeout, interval, [quiet]) ⇒ <code>Promise.&lt;Boolean&gt;</code>
 This is the function you need to run, before being able to speak.
 It includes:
 - feature detection
@@ -195,6 +195,13 @@ Note: if once initialized you can't re-init (will skip and resolve to
   - `browser has no voices (timeout)` - No voice could be loaded with neither
      of the given strategies; chances are high the browser does not have
      any voices embedded (example: Chromium on *buntu os')  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| maxTimeout | <code>number</code> | [5000] the maximum timeout to wait for voices in ms |
+| interval | <code>number</code> | [250] the interval in ms to check for voices |
+| [quiet] | <code>boolean</code> | prevent rejection on errors, e.g. if no voices |
+
 <a name="module_EasySpeech--module.exports..EasySpeech.voices"></a>
 
 ##### EasySpeech.voices() ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
@@ -264,6 +271,7 @@ used as fallback.
 | [options.rate] | <code>number</code> | Optional rate value >= 0.1 and <= 10 |
 | [options.volume] | <code>number</code> | Optional volume value >= 0 and <= 1 |
 | [options.force] | <code>boolean</code> | Optional set to true to force speaking, no matter the internal state |
+| [options.infiniteResume] | <code>boolean</code> | Optional, force or prevent internal resumeInfinity pattern |
 | [handlers] | <code>object</code> | optional additional local handlers, can be   directly added as top-level properties of the options |
 | [handlers.boundary] | <code>function</code> | optional, event handler |
 | [handlers.end] | <code>function</code> | optional, event handler |

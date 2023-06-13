@@ -149,17 +149,25 @@ const detectFeatures = () => {
 const hasProperty = (target = {}, prop) => Object.hasOwnProperty.call(target, prop) || prop in target || !!target[prop]
 
 /** @private **/
-const isAndroid = () => {
-  const ua = (scope.navigator || {}).userAgent || ''
-  return /android/i.test(ua)
+const getUA = () => (scope.navigator || {}).userAgent || ''
+
+/** @private **/
+const isAndroid = () => /android/i.test(getUA())
+
+/** @private **/
+const isKaiOS = () => /kaios/i.test(getUA())
+
+/** @private **/
+const isFirefox = () => {
+  // InstallTrigger will soon be deprecated
+  if (typeof scope.InstallTrigger !== 'undefined') {
+    return true
+  }
+
+  return /firefox/i.test(getUA())
 }
 
 /** @private **/
-const isKaiOS = () => {
-  const ua = (scope.navigator || {}).userAgent || ''
-  return /kaios/i.test(ua)
-}
-const isFirefox = () => typeof scope.InstallTrigger !== 'undefined'
 const isSafari = () => typeof scope.GestureEvent !== 'undefined'
 
 /**
@@ -271,6 +279,9 @@ const status = s => {
  * Note: if once initialized you can't re-init (will skip and resolve to
  * `false`) unless you run `EasySpeech.reset()`.
  *
+ * @param maxTimeout {number}[5000] the maximum timeout to wait for voices in ms
+ * @param interval {number}[250] the interval in ms to check for voices
+ * @param quiet {boolean=} prevent rejection on errors, e.g. if no voices
  * @return {Promise<Boolean>}
  * @fulfil {Boolean} true, if initialized, false, if skipped (because already
  *   initialized)
@@ -284,7 +295,7 @@ const status = s => {
  *      any voices embedded (example: Chromium on *buntu os')
  */
 
-EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
+EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet } = {}) {
   return new Promise((resolve, reject) => {
     if (internal.initialized) { return resolve(false) }
     EasySpeech.reset()
@@ -301,7 +312,11 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250 } = {}) {
       status(`init: failed (${errorMessage})`)
       clearInterval(timer)
       internal.initialized = false
-      return reject(new Error(`EasySpeech: ${errorMessage}`))
+
+      // we have the option to fail quiet here
+      return quiet
+        ? resolve(false)
+        : reject(new Error(`EasySpeech: ${errorMessage}`))
     }
 
     const complete = () => {
@@ -608,6 +623,7 @@ const createUtterance = text => {
  * @param {number=} options.rate - Optional rate value >= 0.1 and <= 10
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
  * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
+ * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -623,7 +639,7 @@ const createUtterance = text => {
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
  * @reject {SpeechSynthesisEvent} rejects using the `error` event
  */
-EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, ...handlers }) => {
+EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, ...handlers }) => {
   ensureInit({ force })
 
   if (!validate.text(text)) {
@@ -688,11 +704,18 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, ...handlers }) =>
     //
     // XXX: resumeInfinity is also incompatible with older safari ios versions
     // so we skip it on safari, too.
+    //
+    // XXX: we can force-enable or force-disable infiniteResume via flag now and
+    // use the deterministic approach if it's not a boolean value
     utterance.addEventListener('start', () => {
       patches.paused = false
       patches.speaking = true
 
-      if (!patches.isFirefox && !patches.isSafari && patches.isAndroid !== true) {
+      const useResumeInfinity = typeof infiniteResume === 'boolean'
+        ? infiniteResume
+        : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true
+
+      if (useResumeInfinity) {
         resumeInfinity(utterance)
       }
     })

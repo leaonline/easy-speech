@@ -24,7 +24,7 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis
  * @type {Object}
  */
-var _excluded = ["text", "voice", "pitch", "rate", "volume", "force"];
+var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume"];
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -159,19 +159,30 @@ var hasProperty = function hasProperty() {
 };
 
 /** @private **/
+var getUA = function getUA() {
+  return (scope.navigator || {}).userAgent || '';
+};
+
+/** @private **/
 var isAndroid = function isAndroid() {
-  var ua = (scope.navigator || {}).userAgent || '';
-  return /android/i.test(ua);
+  return /android/i.test(getUA());
 };
 
 /** @private **/
 var isKaiOS = function isKaiOS() {
-  var ua = (scope.navigator || {}).userAgent || '';
-  return /kaios/i.test(ua);
+  return /kaios/i.test(getUA());
 };
+
+/** @private **/
 var isFirefox = function isFirefox() {
-  return typeof scope.InstallTrigger !== 'undefined';
+  // InstallTrigger will soon be deprecated
+  if (typeof scope.InstallTrigger !== 'undefined') {
+    return true;
+  }
+  return /firefox/i.test(getUA());
 };
+
+/** @private **/
 var isSafari = function isSafari() {
   return typeof scope.GestureEvent !== 'undefined';
 };
@@ -290,6 +301,9 @@ var status = function status(s) {
  * Note: if once initialized you can't re-init (will skip and resolve to
  * `false`) unless you run `EasySpeech.reset()`.
  *
+ * @param maxTimeout {number}[5000] the maximum timeout to wait for voices in ms
+ * @param interval {number}[250] the interval in ms to check for voices
+ * @param quiet {boolean=} prevent rejection on errors, e.g. if no voices
  * @return {Promise<Boolean>}
  * @fulfil {Boolean} true, if initialized, false, if skipped (because already
  *   initialized)
@@ -308,7 +322,8 @@ EasySpeech.init = function () {
     _ref$maxTimeout = _ref.maxTimeout,
     maxTimeout = _ref$maxTimeout === void 0 ? 5000 : _ref$maxTimeout,
     _ref$interval = _ref.interval,
-    interval = _ref$interval === void 0 ? 250 : _ref$interval;
+    interval = _ref$interval === void 0 ? 250 : _ref$interval,
+    quiet = _ref.quiet;
   return new Promise(function (resolve, reject) {
     if (internal.initialized) {
       return resolve(false);
@@ -326,7 +341,9 @@ EasySpeech.init = function () {
       status("init: failed (".concat(errorMessage, ")"));
       clearInterval(timer);
       internal.initialized = false;
-      return reject(new Error("EasySpeech: ".concat(errorMessage)));
+
+      // we have the option to fail quiet here
+      return quiet ? resolve(false) : reject(new Error("EasySpeech: ".concat(errorMessage)));
     };
     var complete = function complete() {
       // avoid race-conditions between listeners and timeout
@@ -634,6 +651,7 @@ var createUtterance = function createUtterance(text) {
  * @param {number=} options.rate - Optional rate value >= 0.1 and <= 10
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
  * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
+ * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -656,6 +674,7 @@ EasySpeech.speak = function (_ref3) {
     rate = _ref3.rate,
     volume = _ref3.volume,
     force = _ref3.force,
+    infiniteResume = _ref3.infiniteResume,
     handlers = _objectWithoutProperties(_ref3, _excluded);
   ensureInit({
     force: force
@@ -723,10 +742,14 @@ EasySpeech.speak = function (_ref3) {
     //
     // XXX: resumeInfinity is also incompatible with older safari ios versions
     // so we skip it on safari, too.
+    //
+    // XXX: we can force-enable or force-disable infiniteResume via flag now and
+    // use the deterministic approach if it's not a boolean value
     utterance.addEventListener('start', function () {
       patches.paused = false;
       patches.speaking = true;
-      if (!patches.isFirefox && !patches.isSafari && patches.isAndroid !== true) {
+      var useResumeInfinity = typeof infiniteResume === 'boolean' ? infiniteResume : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true;
+      if (useResumeInfinity) {
         resumeInfinity(utterance);
       }
     });
