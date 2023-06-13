@@ -127,7 +127,7 @@ var EasySpeech = (function () {
     return typeof key === "symbol" ? key : String(key);
   }
 
-  var _excluded = ["text", "voice", "pitch", "rate", "volume", "force"];
+  var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume"];
   /**
    * @module EasySpeech
    * @typicalname EasySpeech
@@ -272,19 +272,30 @@ var EasySpeech = (function () {
   };
 
   /** @private **/
+  var getUA = function getUA() {
+    return (scope.navigator || {}).userAgent || '';
+  };
+
+  /** @private **/
   var isAndroid = function isAndroid() {
-    var ua = (scope.navigator || {}).userAgent || '';
-    return /android/i.test(ua);
+    return /android/i.test(getUA());
   };
 
   /** @private **/
   var isKaiOS = function isKaiOS() {
-    var ua = (scope.navigator || {}).userAgent || '';
-    return /kaios/i.test(ua);
+    return /kaios/i.test(getUA());
   };
+
+  /** @private **/
   var isFirefox = function isFirefox() {
-    return typeof scope.InstallTrigger !== 'undefined';
+    // InstallTrigger will soon be deprecated
+    if (typeof scope.InstallTrigger !== 'undefined') {
+      return true;
+    }
+    return /firefox/i.test(getUA());
   };
+
+  /** @private **/
   var isSafari = function isSafari() {
     return typeof scope.GestureEvent !== 'undefined';
   };
@@ -753,6 +764,7 @@ var EasySpeech = (function () {
    * @param {number=} options.rate - Optional rate value >= 0.1 and <= 10
    * @param {number=} options.volume - Optional volume value >= 0 and <= 1
    * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
+   * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
    * @param {object=} handlers - optional additional local handlers, can be
    *   directly added as top-level properties of the options
    * @param {function=} handlers.boundary - optional, event handler
@@ -775,6 +787,7 @@ var EasySpeech = (function () {
       rate = _ref3.rate,
       volume = _ref3.volume,
       force = _ref3.force,
+      infiniteResume = _ref3.infiniteResume,
       handlers = _objectWithoutProperties(_ref3, _excluded);
     ensureInit({
       force: force
@@ -842,10 +855,14 @@ var EasySpeech = (function () {
       //
       // XXX: resumeInfinity is also incompatible with older safari ios versions
       // so we skip it on safari, too.
+      //
+      // XXX: we can force-enable or force-disable infiniteResume via flag now and
+      // use the deterministic approach if it's not a boolean value
       utterance.addEventListener('start', function () {
         patches.paused = false;
         patches.speaking = true;
-        if (!patches.isFirefox && !patches.isSafari && patches.isAndroid !== true) {
+        var useResumeInfinity = typeof infiniteResume === 'boolean' ? infiniteResume : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true;
+        if (useResumeInfinity) {
           resumeInfinity(utterance);
         }
       });
