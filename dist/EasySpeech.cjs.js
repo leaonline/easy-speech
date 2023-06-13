@@ -290,6 +290,9 @@ var status = function status(s) {
  * Note: if once initialized you can't re-init (will skip and resolve to
  * `false`) unless you run `EasySpeech.reset()`.
  *
+ * @param maxTimeout {number}[5000] the maximum timeout to wait for voices in ms
+ * @param interval {number}[250] the interval in ms to check for voices
+ * @param quiet {boolean=} prevent rejection on errors, e.g. if no voices
  * @return {Promise<Boolean>}
  * @fulfil {Boolean} true, if initialized, false, if skipped (because already
  *   initialized)
@@ -308,7 +311,8 @@ EasySpeech.init = function () {
     _ref$maxTimeout = _ref.maxTimeout,
     maxTimeout = _ref$maxTimeout === void 0 ? 5000 : _ref$maxTimeout,
     _ref$interval = _ref.interval,
-    interval = _ref$interval === void 0 ? 250 : _ref$interval;
+    interval = _ref$interval === void 0 ? 250 : _ref$interval,
+    quiet = _ref.quiet;
   return new Promise(function (resolve, reject) {
     if (internal.initialized) {
       return resolve(false);
@@ -326,7 +330,9 @@ EasySpeech.init = function () {
       status("init: failed (".concat(errorMessage, ")"));
       clearInterval(timer);
       internal.initialized = false;
-      return reject(new Error("EasySpeech: ".concat(errorMessage)));
+
+      // we have the option to fail quiet here
+      return quiet ? resolve(false) : reject(new Error("EasySpeech: ".concat(errorMessage)));
     };
     var complete = function complete() {
       // avoid race-conditions between listeners and timeout
