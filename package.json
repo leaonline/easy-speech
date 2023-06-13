@@ -14,7 +14,7 @@
     "lint:fix": "standard . --fix | snazzy",
     "prepublish": "npm run lint && npm run test && npm run build && npm run build:docs",
     "build:docs": "jsdoc2md src/EasySpeech.js > API.md",
-    "build:demo": "rollup --config rollup.demo.config.js",
+    "build:demo": "rm docs/demo.js && rollup --config rollup.demo.config.js",
     "build": "rollup --config rollup.dist.config.js"
   },
   "repository": {
