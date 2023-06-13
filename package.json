@@ -9,12 +9,12 @@
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
     "test-debug": "NODE_ENV=test ./node_modules/.bin/mocha  --inspect --debug-brk 'tests/**/*.tests.js'",
-    "test:coverage": "NODE_ENV=test c8 --include=index.js --reporter=html --reporter=text ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
+    "test:coverage": "NODE_ENV=test c8 --all --include=src/EasySpeech.js --reporter=html --reporter=text ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
     "lint": "standard . | snazzy",
     "lint:fix": "standard . --fix | snazzy",
     "prepublish": "npm run lint && npm run test && npm run build && npm run build:docs",
     "build:docs": "jsdoc2md src/EasySpeech.js > API.md",
-    "build:demo": "rollup --config rollup.demo.config.js",
+    "build:demo": "rm docs/demo.js && rollup --config rollup.demo.config.js",
     "build": "rollup --config rollup.dist.config.js"
   },
   "repository": {
@@ -42,7 +42,7 @@
     "c8": "^7.11.3",
     "chai": "^4.3.4",
     "jsdoc-to-markdown": "^8.0.0",
-    "mocha": "^10.0.0",
+    "mocha": "^10.2.0",
     "rollup": "^3.1.0",
     "rollup-plugin-terser": "^7.0.2",
     "sinon": "^15.0.0",
