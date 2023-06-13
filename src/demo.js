@@ -37,7 +37,7 @@ function initInputs (initialized) {
   inputs.volume = document.querySelector('#volume-input')
   inputs.volume.disabled = false
   inputs.volume.addEventListener('change', e => {
-    values.volume = e.target.value / 100
+    values.volume = Number(e.target.value)
     volumeValue.removeChild(volumeValue.firstChild)
     volumeValue.appendChild(document.createTextNode(values.volume))
   })
@@ -46,7 +46,7 @@ function initInputs (initialized) {
   inputs.rate = document.querySelector('#rate-input')
   inputs.rate.disabled = false
   inputs.rate.addEventListener('change', e => {
-    values.rate = e.target.value / 10
+    values.rate = Number(e.target.value) / 10
     rateValue.removeChild(rateValue.firstChild)
     rateValue.appendChild(document.createTextNode(values.rate))
   })
@@ -55,7 +55,7 @@ function initInputs (initialized) {
   inputs.pitch = document.querySelector('#pitch-input')
   inputs.pitch.disabled = false
   inputs.pitch.addEventListener('change', e => {
-    values.pitch = e.target.value
+    values.pitch = Number(e.target.value)
     pitchValue.removeChild(pitchValue.firstChild)
     pitchValue.appendChild(document.createTextNode(values.pitch))
   })
