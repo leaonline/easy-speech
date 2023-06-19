@@ -140,9 +140,9 @@ async function populateVoices (initialized) {
       filteredVoices = value === 'all'
         ? voices
         : voices.filter(voice => (
-            voice.lang.indexOf(`${value}-`) > -1 ||
+          voice.lang.indexOf(`${value}-`) > -1 ||
             voice.lang.indexOf(`${value}_`) > -1))
-        .sort((a, b) => a.name.localeCompare(b.name))
+          .sort((a, b) => a.name.localeCompare(b.name))
 
       filteredVoices.forEach((voice, index) => {
         const service = voice.localService ? 'local' : 'remote'
@@ -155,8 +155,7 @@ async function populateVoices (initialized) {
 
       inputs.voice.classList.remove('disabled')
       inputs.voice.removeAttribute('disabled')
-    }
-    else {
+    } else {
       inputs.voice.classList.add('disabled')
       inputs.voice.disabled = true
       values.voice = null
