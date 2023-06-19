@@ -131,35 +131,36 @@ async function populateVoices (initialized) {
     while (inputs.voice.firstChild) {
       inputs.voice.removeChild(inputs.voice.lastChild)
     }
+
     inputs.voice.appendChild(textNode('(Select voice)', 'option'))
 
     const value = e.target.value
 
-    if (!value) {
+    if (value) {
+      filteredVoices = value === 'all'
+        ? voices
+        : voices.filter(voice => (
+          voice.lang.indexOf(`${value}-`) > -1 ||
+            voice.lang.indexOf(`${value}_`) > -1))
+          .sort((a, b) => a.name.localeCompare(b.name))
+
+      filteredVoices.forEach((voice, index) => {
+        const service = voice.localService ? 'local' : 'remote'
+        const isDefault = voice.default ? '[DEFAULT]' : ''
+        const voiceName = `${isDefault}${voice.name} - ${voice.voiceURI} (${service})`
+        const option = textNode(voiceName, 'option')
+        option.setAttribute('value', index.toString(10))
+        inputs.voice.appendChild(option)
+      })
+
+      inputs.voice.classList.remove('disabled')
+      inputs.voice.removeAttribute('disabled')
+    } else {
       inputs.voice.classList.add('disabled')
       inputs.voice.disabled = true
       values.voice = null
       filteredVoices = null
-      return
     }
-
-    filteredVoices = voices
-      .filter(voice => {
-        return voice.lang.indexOf(`${value}-`) > -1 || voice.lang.indexOf(`${value}_`) > -1
-      })
-      .sort((a, b) => a.name.localeCompare(b.name))
-
-    filteredVoices.forEach((voice, index) => {
-      const service = voice.localService ? 'local' : 'remote'
-      const isDefault = voice.default ? '[DEFAULT]' : ''
-      const voiceName = `${isDefault}${voice.name} - ${voice.voiceURI} (${service})`
-      const option = textNode(voiceName, 'option')
-      option.setAttribute('value', index.toString(10))
-      inputs.voice.appendChild(option)
-    })
-
-    inputs.voice.classList.remove('disabled')
-    inputs.voice.removeAttribute('disabled')
   })
 
   inputs.voice.addEventListener('change', e => {
