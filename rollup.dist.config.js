@@ -1,5 +1,6 @@
 import { babel, getBabelOutputPlugin } from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
+import copy from 'rollup-plugin-copy'
 
 export default [{
   input: 'src/EasySpeech.js',
@@ -31,6 +32,11 @@ export default [{
     babel({
       exclude: 'node_modules/**',
       babelHelpers: 'bundled'
+    }),
+    copy({
+      targets: [
+        { src: 'src/index.d.ts', dest: 'dist/index.d.ts' },
+      ]
     })
   ]
 }]
