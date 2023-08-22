@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/EasySpeech.cjs.js",
   "browser": "dist/EasySpeech.iife.js",
-  "exports": "./dist/EasySpeech.js",
+  "exports": "./dist/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
     "test-debug": "NODE_ENV=test ./node_modules/.bin/mocha  --inspect --debug-brk 'tests/**/*.tests.js'",

@@ -18,14 +18,14 @@ type Status =
       handlers: any;
     };
 
-export class EasySpeech {
-  public init(request: {
+export default class EasySpeech {
+  public static init(request: {
     maxTimeout: number;
     interval: number;
-    quiet: boolean;
+    quiet?: boolean;
   }): Promise<boolean>;
 
-  public detect(): {
+  public static detect(): {
     speechSynthesis: SpeechSynthesis | undefined;
     speechSynthesisUtterance: SpeechSynthesisUtterance | undefined;
     speechSynthesisVoice: SpeechSynthesisVoice | undefined;
@@ -41,11 +41,11 @@ export class EasySpeech {
     onstart: boolean;
   };
 
-  public status(): Status;
+  public static status(): Status;
 
-  public voices(): SpeechSynthesisVoice[];
+  public static voices(): SpeechSynthesisVoice[];
 
-  public on(handlers: {
+  public static on(handlers: {
     boundary?: (event: SpeechSynthesisEvent) => void;
     end?: (event: SpeechSynthesisEvent) => void;
     mark?: (event: SpeechSynthesisEvent) => void;
@@ -55,7 +55,7 @@ export class EasySpeech {
     error?: (event: SpeechSynthesisErrorEvent) => void;
   }): SpeechSynthesisVoice[];
 
-  public defaults(options: {
+  public static defaults(options: {
     voice?: SpeechSynthesisVoice;
     pitch?: number;
     rate?: number;
@@ -67,7 +67,7 @@ export class EasySpeech {
     voice: null | SpeechSynthesisVoice;
   };
 
-  public speak(options: {
+  public static speak(options: {
     text: string;
     voice?: SpeechSynthesisVoice;
     pitch?: number;
@@ -84,11 +84,11 @@ export class EasySpeech {
     error?: (event: SpeechSynthesisErrorEvent) => void;
   }): Promise<any>;
 
-  public cancel(): void;
+  public static cancel(): void;
 
-  public resume(): void;
+  public static resume(): void;
 
-  public pause(): void;
+  public static pause(): void;
 
-  public reset(): void;
+  public static reset(): void;
 }
