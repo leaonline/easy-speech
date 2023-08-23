@@ -35,7 +35,7 @@ export default [{
     }),
     copy({
       targets: [
-        { src: 'src/index.d.ts', dest: 'dist/index.d.ts' },
+        { src: 'src/index.d.ts', dest: 'dist/index.d.ts' }
       ]
     })
   ]
