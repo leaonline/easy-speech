@@ -1,3 +1,13 @@
+**2.2.1**
+- added [TypeScript types](./src/index.d.ts)
+
+**2.1.0**
+- updated dependencies
+- docs: add issue templates by @jankapunkt in #161
+- fix(demo): sliders always parse values to Number by @jankapunkt in #157
+- feature: add quiet flag to init fn to silently fail on error by @jankapunkt in #155
+- feature: force use/prevent resumeInfinity via flag by @jankapunkt in #156
+
 **2.0.0**
 - Added multiple build targets
 - Potentially breaking for ci, since build output is
