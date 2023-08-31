@@ -151,7 +151,6 @@ async function populateVoices (initialized) {
     inputs.language.appendChild(option)
   })
 
-
   debug('attach events, cleanup')
   inputs.voice = document.querySelector('#voice-select')
 
@@ -177,7 +176,7 @@ function updateVoiceSelect (voices, value, defaultURI) {
     filteredVoices = value === 'all'
       ? voices
       : voices.filter(voice => (
-          voice.lang.indexOf(`${value}-`) > -1 ||
+        voice.lang.indexOf(`${value}-`) > -1 ||
           voice.lang.indexOf(`${value}_`) > -1))
         .sort((a, b) => a.name.localeCompare(b.name))
 
@@ -205,7 +204,7 @@ function updateVoiceSelect (voices, value, defaultURI) {
   }
 }
 
-function selectVoice(index) {
+function selectVoice (index) {
   if (index < 0 || index > filteredVoices.length - 1) {
     values.voice = undefined
     return

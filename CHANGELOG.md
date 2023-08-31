@@ -1,4 +1,4 @@
-**2.2.1**
+**2.1.1**
 - added [TypeScript types](./src/index.d.ts)
 
 **2.1.0**
