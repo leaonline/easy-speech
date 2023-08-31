@@ -16,8 +16,15 @@ part of `Web Speech API` running on most major browsers.
 
 **Note:** this is not a polyfill package, if your target browser does not 
 support speech synthesis or the Web Speech API, this package is not usable.
+
+## Live Demo
+
+The live demo is available at https://jankapunkt.github.io/easy-speech/
+You can use it to test your browser for `speechSynthesis` support and functionality.
+
+[![live demo screenshot](./docs/demo_screenshot.png)](https://jankapunkt.github.io/easy-speech/)
   
-## Install
+## Installation
 
 Install from npm via
 
@@ -33,6 +40,7 @@ You can also use the various builds for different targets, see the `dist` folder
 - `/dist/EasySpeech.iife.js` - Legacy compatible build, works even with older 
   or exotic browsers, as long as they support Promises (PRs welcome to transform 
   to callbacks!)
+- `/dist/index.d.ts` - TypeScript type definitions
 
 You can use them via CDN:
 
