@@ -9,7 +9,7 @@
     <title>EasySpeech - Cross browser Speech Synthesis with easy API</title>
 </head>
 <body>
-<div class="bg-dark pb-3 navbar-nav">
+<div class="bg-dark pb-3 navbar-nav py-4">
     <h1 class="text-center text-white ">
         <a href="#" class="text-decoration-none text-white" >EasySpeech</a>
     </h1>
@@ -49,22 +49,23 @@
     </div>
 </div>
 <div class="container">
-    <hr>
     <div class="row">
 
         <!-- speak input -->
         <div class="col-12 col-md-6 mt-3">
-            <div class="card">
-                <div class="card-header bg-primary text-white">Speak</div>
+            <div class="card border-light">
 
                 <!-- selects -->
                 <div class="card-body">
-                    <select id="lang-select" class="form-control disabled"
+                    <div class="card-title py-2 border-bottom clearfix">
+                        <span class="fw-light text-uppercase float-start">Speaking</span>
+                    </div>
+                    <select id="lang-select" class="form-control disabled mt-3"
                             disabled>
                         <option>(Select language)</option>
                         <option value="all">All languages</option>
                     </select>
-                    <select id="voice-select" class="form-control disabled"
+                    <select id="voice-select" class="form-control disabled my-2"
                             disabled>
                         <option>(Select voice)</option>
                     </select>
@@ -96,9 +97,9 @@
                 <div class="card-body">
                     <textarea rows="3" class="form-control" id="text-input"
                               disabled
-                              placeholder="enter text to speak"></textarea>
+                              placeholder="Enter text to speak..."></textarea>
                 </div>
-                <div class="card-footer">
+                <div class="card-body">
                     <button class="btn btn-primary speak-btn w-100">
                         Speak now
                     </button>
@@ -108,9 +109,19 @@
 
         <!--Output of detected features and init result-->
         <div class="col-12 col-md-6 mt-3">
-            <div class="card">
-                <div class="card-header init-status-header text-white">Init
-                    status
+            <div class="card border-light">
+                <div class="card-body">
+                    <div class="card-title py-2 border-bottom clearfix">
+                        <span class="fw-light text-uppercase float-start">Init status</span>
+                        <span class="badge bg-info init-status-header float-end">
+                            <div class="spinner-border spinner-border-sm init-status-loader" role="status">
+                              <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span class="init-status-text">
+                                Checking features...
+                            </span>
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <span class="fw-bold border-bottom">
@@ -129,9 +140,11 @@
 
         <!-- about -->
         <div class="col-12 col-md-6 mt-3">
-            <div class="card">
-                <div class="card-header">About</div>
+            <div class="card border-light">
                 <div class="card-body">
+                    <div class="card-title py-2 border-bottom clearfix">
+                        <span class="fw-light text-uppercase float-start">About</span>
+                    </div>
                     <p>
                         This project was created, because it's always a struggle
                         to get the synthesis
@@ -155,8 +168,12 @@
 
         <!--debug log-->
         <div class="col-12 col-md-6 mt-3">
-            <div class="card">
-                <div class="card-header">Debug log</div>
+            <div class="card border-light">
+                <div class="card-body">
+                    <div class="card-title py-2 border-bottom clearfix">
+                        <span class="fw-light text-uppercase float-start">Debug log</span>
+                    </div>
+                </div>
                 <div class="card-body log-body"></div>
             </div>
         </div>
