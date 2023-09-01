@@ -79,24 +79,33 @@ function debug (arg) {
 
 async function init () {
   const header = document.querySelector('.init-status-header')
+  const loader = document.querySelector('.init-status-loader')
+  const text = document.querySelector('.init-status-text')
   const body = document.querySelector('.init-status-body')
-  header.classList.add('bg-info')
 
   let success
   let message
+  let summary
   try {
     success = await EasySpeech.init()
     message = 'Successfully intialized 🎉'
+    summary = 'Successful'
   } catch (e) {
     success = false
     message = e.message
+    summary = 'Failed'
+    const speakBtn = document.querySelector('.speak-btn')
+    speakBtn.classList.add('disabled')
+    speakBtn.setAttribute('disabled', '')
   } finally {
     const bg = success
       ? 'bg-success'
       : 'bg-danger'
 
+    loader.classList.add('d-none')
     header.classList.remove('bg-info')
     header.classList.add(bg)
+    text.textContent = summary
     body.appendChild(textNode(message))
   }
 
@@ -109,9 +118,17 @@ async function populateVoices (initialized) {
   debug('find unique languages...')
   const voices = EasySpeech.voices()
   const languages = new Set()
+  let defaultLang
+  let defaultURI
 
-  voices.forEach(voice => {
-    languages.add(voice.lang.split(/[-_]/)[0])
+  voices.forEach((voice, index) => {
+    const lang = voice.lang.split(/[-_]/)[0]
+    languages.add(lang)
+
+    if (voice.default) {
+      defaultLang = lang
+      defaultURI = voice.voiceURI
+    }
   })
 
   debug(`found ${languages.size} languages`)
@@ -121,60 +138,79 @@ async function populateVoices (initialized) {
   Array.from(languages).sort().forEach(lang => {
     const option = textNode(lang, 'option')
     option.setAttribute('value', lang)
+
+    if (defaultLang && lang === defaultLang) {
+      option.setAttribute('selected', '')
+      setTimeout(() => updateVoiceSelect(voices, lang, defaultURI), 250)
+      setTimeout(() => {
+        const index = filteredVoices.findIndex(v => v.voiceURI === defaultURI)
+        selectVoice(index + 1)
+      }, 500)
+    }
+
     inputs.language.appendChild(option)
   })
 
   debug('attach events, cleanup')
   inputs.voice = document.querySelector('#voice-select')
 
-  inputs.language.addEventListener('change', e => {
-    while (inputs.voice.firstChild) {
-      inputs.voice.removeChild(inputs.voice.lastChild)
-    }
-
-    inputs.voice.appendChild(textNode('(Select voice)', 'option'))
-
-    const value = e.target.value
-
-    if (value) {
-      filteredVoices = value === 'all'
-        ? voices
-        : voices.filter(voice => (
-          voice.lang.indexOf(`${value}-`) > -1 ||
-            voice.lang.indexOf(`${value}_`) > -1))
-          .sort((a, b) => a.name.localeCompare(b.name))
-
-      filteredVoices.forEach((voice, index) => {
-        const service = voice.localService ? 'local' : 'remote'
-        const isDefault = voice.default ? '[DEFAULT]' : ''
-        const voiceName = `${isDefault}${voice.name} - ${voice.voiceURI} (${service})`
-        const option = textNode(voiceName, 'option')
-        option.setAttribute('value', index.toString(10))
-        inputs.voice.appendChild(option)
-      })
-
-      inputs.voice.classList.remove('disabled')
-      inputs.voice.removeAttribute('disabled')
-    } else {
-      inputs.voice.classList.add('disabled')
-      inputs.voice.disabled = true
-      values.voice = null
-      filteredVoices = null
-    }
-  })
+  inputs.language.addEventListener('change', (e) => updateVoiceSelect(voices, e.target.value))
 
   inputs.voice.addEventListener('change', e => {
-    const value = Number.parseInt(e.target.value, 10)
-    if (value < 0 || value > filteredVoices.length - 1) {
-      values.voice = undefined
-      return
-    }
-
-    values.voice = (filteredVoices || [])[value]
+    const index = Number.parseInt(e.target.value, 10)
+    selectVoice(index)
   })
 
   inputs.language.classList.remove('disabled')
   inputs.language.removeAttribute('disabled')
+}
+
+function updateVoiceSelect (voices, value, defaultURI) {
+  while (inputs.voice.firstChild) {
+    inputs.voice.removeChild(inputs.voice.lastChild)
+  }
+
+  inputs.voice.appendChild(textNode('(Select voice)', 'option'))
+
+  if (value) {
+    filteredVoices = value === 'all'
+      ? voices
+      : voices.filter(voice => (
+        voice.lang.indexOf(`${value}-`) > -1 ||
+          voice.lang.indexOf(`${value}_`) > -1))
+        .sort((a, b) => a.name.localeCompare(b.name))
+
+    filteredVoices.forEach((voice, index) => {
+      const service = voice.localService ? 'local' : 'remote'
+      const isDefault = voice.default ? '[DEFAULT]' : ''
+      const voiceName = `${isDefault}${voice.name} - ${voice.voiceURI} (${service})`
+      const option = textNode(voiceName, 'option')
+      option.setAttribute('value', index.toString(10))
+
+      if (defaultURI && defaultURI === voice.voiceURI) {
+        option.setAttribute('selected', '')
+      }
+
+      inputs.voice.appendChild(option)
+    })
+
+    inputs.voice.classList.remove('disabled')
+    inputs.voice.removeAttribute('disabled')
+  } else {
+    inputs.voice.classList.add('disabled')
+    inputs.voice.disabled = true
+    values.voice = null
+    filteredVoices = null
+  }
+}
+
+function selectVoice (index) {
+  if (index < 0 || index > filteredVoices.length - 1) {
+    values.voice = undefined
+    return
+  }
+
+  values.voice = (filteredVoices || [])[index]
 }
 
 function initSpeak (inititalized) {
