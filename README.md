@@ -1,4 +1,15 @@
-# Easy Speech
+<h1 align="center">Easy Speech</h1>
+
+<div align="center">
+Cross browser Speech Synthesis; no dependencies.
+</div>
+
+  <p align="center">
+    <br />
+    <a href="https://github.com/jankapunkt/easy-speech/blob/master/API.md"><strong>API docs »</strong></a>
+    <br />
+  </p>
+
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -9,15 +20,35 @@
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
 
 
-Cross browser Speech Synthesis; no dependencies.
+
+## ⭐️ Why EasySpeech?
 
 This project was created, because it's always a struggle to get the synthesis
 part of `Web Speech API` running on most major browsers.
 
-**Note:** this is not a polyfill package, if your target browser does not 
-support speech synthesis or the Web Speech API, this package is not usable.
+## ✨ Features
+
+- 🪄 Single API for using `speechSynthesis` across multiple browsers
+- 🌈 Async API (Promises, async/await)
+- 🚀 Hooks for all events; global and/or voice-instance-specific
+- 🌱 Easy to set up and integrate: auto-detects and loads available voices
+- 🔧 Includes fixes or workarounds for many browser-specific quirks
+- 📝 Internal logging via `EasySpeech.debug` hook
+- 📦 Multiple build targets
+- 🎮 Live demo to test your browser
+ 
+
+**Note:** this is not a polyfill package, if your target browser does not  support speech synthesis or the Web Speech
+API, this package is not usable.
+
+## 🚀 Live Demo
+
+The live demo is available at https://jankapunkt.github.io/easy-speech/
+You can use it to test your browser for `speechSynthesis` support and functionality.
+
+[![live demo screenshot](./docs/demo_screenshot.png)](https://jankapunkt.github.io/easy-speech/)
   
-## Install
+## 📦 Installation
 
 Install from npm via
 
@@ -33,6 +64,7 @@ You can also use the various builds for different targets, see the `dist` folder
 - `/dist/EasySpeech.iife.js` - Legacy compatible build, works even with older 
   or exotic browsers, as long as they support Promises (PRs welcome to transform 
   to callbacks!)
+- `/dist/index.d.ts` - TypeScript type definitions
 
 You can use them via CDN:
 
@@ -48,7 +80,7 @@ You can use them via CDN:
 <script src="https://cdn.jsdelivr.net/npm/easy-speech/dist/EasySpeech.iife.js"></script>
 ```
 
-## Usage
+## 👨‍💻 Usage
 
 Import `EasySpeech` and first, detect, if your browser is capable of tts (text
 to speech):
@@ -145,11 +177,11 @@ an error occurred. You can additionally attach these event listeners if you like
 or use `EasySpeech.on` to attach default listeners to every time you call 
 `EasySpeech.speak`.
 
-## API
+## 🔬 API
 
 There is a full API documentation available: [api docs](./API.md)
 
-## Contribution and development
+## ⌨️ Contribution and development
 
 Every contribution is welcomed, please open issues if anything is not working
 as expected.
@@ -157,7 +189,7 @@ as expected.
 If you intend to contribute code, please read the 
 [guidelines on contributing](./CONTRIBUTING.md).
 
-## Resources
+## 📖 Resources
 
 This project used several resources to gain insights about how to get the best cross-browser SpeechSynthesis running:
 
