@@ -680,6 +680,9 @@ EasySpeech.speak = function (_ref3) {
   if (!validate.text(text)) {
     throw new Error('EasySpeech: at least some valid text is required to speak');
   }
+  if (new TextEncoder().encode(text).length > 4096) {
+    throw new Error('EasySpeech: text exceeds max length of 4096 bytes.');
+  }
   var getValue = function getValue(options) {
     var _internal$defaults2;
     var _Object$entries$ = _slicedToArray(Object.entries(options)[0], 2),
