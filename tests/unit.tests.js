@@ -7,7 +7,6 @@ import {
   initScope,
   createUtteranceClass
 } from './test-helpers.js'
-import crypto from 'crypto'
 
 describe('unit tests', function () {
   afterEach(function () {
@@ -524,20 +523,16 @@ describe('unit tests', function () {
       globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
       globalThis.speechSynthesis = speechSynthesis
 
-      crypto.randomBytes(4096, (err, buf) => {
-        if (err) {
-          return done(err)
-        }
-
-        const text = buf.toString('utf-8')
-        EasySpeech.init()
-          .catch(e => done(e))
-          .then(() => {
-            expect(() => EasySpeech.speak({ text }))
-              .to.throw('EasySpeech: text exceeds max length of 4096 bytes.')
-            done()
-          })
-      })
+      const buffer = Buffer.alloc(4097, '0')
+      const decoder = new TextDecoder('UTF-8')
+      const text = decoder.decode(buffer)
+      EasySpeech.init()
+        .catch(e => done(e))
+        .then(() => {
+          expect(() => EasySpeech.speak({ text }))
+            .to.throw('EasySpeech: text exceeds max length of 4096 bytes.')
+          done()
+        })
     })
     it('speaks, if at least some text is given', function (done) {
       const SpeechSynthesisUtterance = class SpeechSynthesisUtterance {
