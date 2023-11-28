@@ -7,6 +7,7 @@ import {
   initScope,
   createUtteranceClass
 } from './test-helpers.js'
+import sinon from 'sinon/pkg/sinon-esm.js'
 
 describe('unit tests', function () {
   afterEach(function () {
@@ -210,7 +211,8 @@ describe('unit tests', function () {
         onpause: false,
         onresume: false,
         onstart: false,
-        onvoiceschanged: false
+        onvoiceschanged: false,
+        maxLengthExceeded: 'warn'
       })
     })
 
@@ -251,7 +253,8 @@ describe('unit tests', function () {
             onpause: false,
             onresume: false,
             onstart: false,
-            onvoiceschanged: false
+            onvoiceschanged: false,
+            maxLengthExceeded: 'warn'
           })
           done()
         })
@@ -299,7 +302,8 @@ describe('unit tests', function () {
             onpause: false,
             onresume: false,
             onstart: false,
-            onvoiceschanged: true
+            onvoiceschanged: true,
+            maxLengthExceeded: 'warn'
           })
           done()
         })
@@ -363,7 +367,8 @@ describe('unit tests', function () {
             onpause: false,
             onresume: false,
             onstart: false,
-            onvoiceschanged: false
+            onvoiceschanged: false,
+            maxLengthExceeded: 'warn'
           })
           expect(listener).to.equal(null)
           expect(listenerAdded).to.equal(true)
@@ -510,28 +515,95 @@ describe('unit tests', function () {
           done()
         })
     })
-    it('throws if text exceeds 4096 bytes lengtgh', function (done) {
+    it('ignores if text exceeds 4096 bytes length', function (done) {
+      const spy = sinon.spy(console, 'warn')
       const SpeechSynthesisUtterance = createUtteranceClass()
-
+      const id = randomId()
       const speechSynthesis = {
-        getVoices: () => [{}],
+        getVoices: () => [{ id }],
+        cancel: () => {},
         speak: function () {
-          done(new Error('should not reach'))
-        },
-        cancel: () => {}
+          expect(spy.calledWith('EasySpeech: text exceeds max length of 4096 bytes, which will not work with some voices.'))
+            .to.equal(false)
+          spy.restore()
+          done()
+        }
       }
       globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
       globalThis.speechSynthesis = speechSynthesis
-
-      const buffer = Buffer.alloc(4097, '0')
-      const decoder = new TextDecoder('UTF-8')
-      const text = decoder.decode(buffer)
-      EasySpeech.init()
-        .catch(e => done(e))
+      EasySpeech.init({ maxLengthExceeded: 'none'})
+        .catch(done)
         .then(() => {
-          expect(() => EasySpeech.speak({ text }))
-            .to.throw('EasySpeech: text exceeds max length of 4096 bytes.')
+          const buffer = Buffer.alloc(4097, '0')
+          const decoder = new TextDecoder('UTF-8')
+          const text = decoder.decode(buffer)
+          EasySpeech.init()
+            .catch(done)
+            .then(() => {
+              EasySpeech.speak({ text }).catch(done)
+            })
+        })
+    })
+    it('warns if text exceeds 4096 bytes length', function (done) {
+      const spy = sinon.spy(console, 'warn')
+      const SpeechSynthesisUtterance = createUtteranceClass()
+      const id = randomId()
+      const speechSynthesis = {
+        getVoices: () => [{ id }],
+        cancel: () => {},
+        speak: function () {
+          expect(spy.calledWith('EasySpeech: text exceeds max length of 4096 bytes, which will not work with some voices.'))
+            .to.equal(true)
+          spy.restore()
           done()
+        }
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      EasySpeech.init()
+        .catch(done)
+        .then(() => {
+          const buffer = Buffer.alloc(4097, '0')
+          const decoder = new TextDecoder('UTF-8')
+          const text = decoder.decode(buffer)
+          EasySpeech.init()
+            .catch(done)
+            .then(() => {
+              EasySpeech.speak({ text }).catch(done)
+            })
+        })
+    })
+    it('throws if text exceeds 4096 bytes length', function (done) {
+      const SpeechSynthesisUtterance = createUtteranceClass()
+      const id = randomId()
+      const speechSynthesis = {
+        getVoices: () => [{ id }]
+      }
+      globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+      globalThis.speechSynthesis = speechSynthesis
+      EasySpeech.init({ maxLengthExceeded: 'error' })
+        .catch(done)
+        .then(() => {
+          const speechSynthesis = {
+            getVoices: () => [{}],
+            speak: function () {
+              done(new Error('should not reach'))
+            },
+            cancel: () => {}
+          }
+          globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
+          globalThis.speechSynthesis = speechSynthesis
+
+          const buffer = Buffer.alloc(4097, '0')
+          const decoder = new TextDecoder('UTF-8')
+          const text = decoder.decode(buffer)
+          EasySpeech.init()
+            .catch(e => done(e))
+            .then(() => {
+              expect(() => EasySpeech.speak({ text }))
+                .to.throw('EasySpeech: text exceeds max length of 4096 bytes, which will not work with some voices.')
+              done()
+            })
         })
     })
     it('speaks, if at least some text is given', function (done) {

@@ -33,6 +33,8 @@ export const createUtteranceClass = () => {
       this.onstart = null
       this.onerror = null
     }
+
+    addEventListener () {}
   }
 
   c.prototype.onend = null
