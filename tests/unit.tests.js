@@ -531,7 +531,7 @@ describe('unit tests', function () {
       }
       globalThis.SpeechSynthesisUtterance = SpeechSynthesisUtterance
       globalThis.speechSynthesis = speechSynthesis
-      EasySpeech.init({ maxLengthExceeded: 'none'})
+      EasySpeech.init({ maxLengthExceeded: 'none' })
         .catch(done)
         .then(() => {
           const buffer = Buffer.alloc(4097, '0')
