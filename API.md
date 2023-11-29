@@ -8,7 +8,7 @@
             * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
             * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
             * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
-            * [.init(maxTimeout, interval, [quiet])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
+            * [.init(maxTimeout, interval, [quiet], [maxLengthExceeded])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
             * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
             * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
             * [.defaults([options])](#module_EasySpeech--module.exports..EasySpeech.defaults) ⇒ <code>object</code>
@@ -62,7 +62,7 @@ const example = async () => {
     * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
     * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
     * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
-    * [.init(maxTimeout, interval, [quiet])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
+    * [.init(maxTimeout, interval, [quiet], [maxLengthExceeded])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
     * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
     * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
     * [.defaults([options])](#module_EasySpeech--module.exports..EasySpeech.defaults) ⇒ <code>object</code>
@@ -161,7 +161,7 @@ EasySpeech.status()
 ```
 <a name="module_EasySpeech--module.exports..EasySpeech.init"></a>
 
-##### EasySpeech.init(maxTimeout, interval, [quiet]) ⇒ <code>Promise.&lt;Boolean&gt;</code>
+##### EasySpeech.init(maxTimeout, interval, [quiet], [maxLengthExceeded]) ⇒ <code>Promise.&lt;Boolean&gt;</code>
 This is the function you need to run, before being able to speak.
 It includes:
 - feature detection
@@ -201,6 +201,7 @@ Note: if once initialized you can't re-init (will skip and resolve to
 | maxTimeout | <code>number</code> | [5000] the maximum timeout to wait for voices in ms |
 | interval | <code>number</code> | [250] the interval in ms to check for voices |
 | [quiet] | <code>boolean</code> | prevent rejection on errors, e.g. if no voices |
+| [maxLengthExceeded] | <code>string</code> | defines what to do, if max text length (4096 bytes) is exceeded: - 'error' - throw an Error - 'none' - do nothing; note that some voices may not speak the text at all without any error or warning - 'warn' - default, raises a warning |
 
 <a name="module_EasySpeech--module.exports..EasySpeech.voices"></a>
 

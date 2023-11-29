@@ -20,7 +20,6 @@ Cross browser Speech Synthesis; no dependencies.
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
 
 
-
 ## ⭐️ Why EasySpeech?
 
 This project was created, because it's always a struggle to get the synthesis
@@ -41,13 +40,32 @@ part of `Web Speech API` running on most major browsers.
 **Note:** this is not a polyfill package, if your target browser does not  support speech synthesis or the Web Speech
 API, this package is not usable.
 
+
 ## 🚀 Live Demo
 
 The live demo is available at https://jankapunkt.github.io/easy-speech/
 You can use it to test your browser for `speechSynthesis` support and functionality.
 
 [![live demo screenshot](./docs/demo_screenshot.png)](https://jankapunkt.github.io/easy-speech/)
-  
+
+## Table of Contents
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [📦 Installation](#-installation)
+- [👨‍💻 Usage](#-usage)
+  - [🚀 Initialize](#-initialize)
+  - [📢 Speak a voice](#-speak-a-voice)
+  - [😵‍💫 Troubleshooting / FAQ](#-troubleshooting--faq)
+- [🔬 API](#-api)
+- [⌨️ Contribution and development](#-contribution-and-development)
+- [📖 Resources](#-resources)
+- [⚖️ License](#-license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 📦 Installation
 
 Install from npm via
@@ -115,7 +133,7 @@ If at least `SpeechSynthesis` and `SpeechSynthesisUtterance` are defined you
 are good to go.
 
 
-### Initialize
+### 🚀 Initialize
 
 Preparing everything to work is not as clear as it should, especially when 
 targeting cross-browser functionality. The asynchronous init function will help
@@ -127,7 +145,7 @@ EasySpeech.init({ maxTimeout: 5000, interval: 250 })
     .catch(e => console.error(e))
 ``` 
 
-#### Loading voices
+#### 💽 Loading voices
 
 The init-routine will go through several stages to setup the environment:
 
@@ -156,7 +174,7 @@ Note: This fallback voice is not overridden by `EasySpeech.defaults()`, your
 default voice will be used in favor but the fallback voice will always be there
 in case no voice is found when calling `EasySpeech.speak()`
 
-### Speak a voice
+### 📢 Speak a voice
 
 This is as easy as it gets:
 
@@ -176,6 +194,10 @@ The Promise will automatically resolve when the speaking ends or rejects when
 an error occurred. You can additionally attach these event listeners if you like
 or use `EasySpeech.on` to attach default listeners to every time you call 
 `EasySpeech.speak`.
+
+### 😵‍💫 Troubleshooting / FAQ
+
+There is an own [FAQ section](./FAQ.md) available that aims to help with common issues.
 
 ## 🔬 API
 
@@ -206,6 +228,6 @@ This project used several resources to gain insights about how to get the best c
 - https://bugs.chromium.org/p/chromium/issues/detail?id=582455
 - https://stackoverflow.com/a/65883556
 
-## License
+## ⚖️ License
 
 MIT, see [license file](./LICENSE)

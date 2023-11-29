@@ -42,6 +42,7 @@ const scope = typeof globalThis === 'undefined' ? window : globalThis;
     speechSynthesisEvent: null|SpeechSynthesisEvent,
     speechSynthesisErrorEvent: null|SpeechSynthesisErrorEvent,
     voices: null|Array<SpeechSynthesisVoice>,
+    maxLengthExceeded: string,
     defaults: {
       pitch: Number,
       rate: Number,
@@ -282,6 +283,10 @@ const status = s => {
  * @param maxTimeout {number}[5000] the maximum timeout to wait for voices in ms
  * @param interval {number}[250] the interval in ms to check for voices
  * @param quiet {boolean=} prevent rejection on errors, e.g. if no voices
+ * @param maxLengthExceeded {string=} defines what to do, if max text length (4096 bytes) is exceeded:
+ * - 'error' - throw an Error
+ * - 'none' - do nothing; note that some voices may not speak the text at all without any error or warning
+ * - 'warn' - default, raises a warning
  * @return {Promise<Boolean>}
  * @fulfil {Boolean} true, if initialized, false, if skipped (because already
  *   initialized)
@@ -295,7 +300,7 @@ const status = s => {
  *      any voices embedded (example: Chromium on *buntu os')
  */
 
-EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet } = {}) {
+EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet, maxLengthExceeded } = {}) {
   return new Promise((resolve, reject) => {
     if (internal.initialized) { return resolve(false) }
     EasySpeech.reset();
@@ -307,6 +312,8 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet } = {}) {
     let timer;
     let voicesChangedListener;
     let completeCalled = false;
+
+    internal.maxLengthExceeded = maxLengthExceeded || 'warn';
 
     const fail = (errorMessage) => {
       status(`init: failed (${errorMessage})`);
@@ -644,6 +651,19 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
 
   if (!validate.text(text)) {
     throw new Error('EasySpeech: at least some valid text is required to speak')
+  }
+
+  if ((new TextEncoder().encode(text)).length > 4096) {
+    const message = 'EasySpeech: text exceeds max length of 4096 bytes, which will not work with some voices.';
+    switch (internal.maxLengthExceeded) {
+      case 'none':
+        break
+      case 'error':
+        throw new Error(message)
+      case 'warn':
+      default:
+        console.warn(message);
+    }
   }
 
   const getValue = options => {
