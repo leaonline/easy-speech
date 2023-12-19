@@ -104,8 +104,10 @@ describe('unit tests', function () {
     })
   })
   describe('EasySpeech.voices', function () {
-    it('throws if not initialized', function () {
+    beforeEach(() => {
       EasySpeech.reset()
+    })
+    it('throws if not initialized', function () {
       expect(() => EasySpeech.voices()).to.throw(errorName)
     })
     it('returns the voices', async function () {
@@ -113,8 +115,86 @@ describe('unit tests', function () {
       await initScope({
         speechSynthesis: { getVoices: () => [voice] }
       })
-
       expect(EasySpeech.voices()).to.deep.equal([voice])
+    })
+    it('sets a voice with .default al default voice', async () => {
+      const voices = [{}, { default: true }, {}]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+      const { defaultVoice } = EasySpeech.status()
+      expect(defaultVoice).to.equal(voices[1])
+    })
+    it('sets a language-specific voice as default voice, if no .default is available', async () => {
+      global.navigator = { language: 'de-DE' }
+      const voices = [{}, {}, { lang: 'de_DE' }]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+      const { defaultVoice } = EasySpeech.status()
+      expect(defaultVoice).to.equal(voices[2])
+    })
+    it('sets he first available voice as default, if no lang is available', async () => {
+      const voices = [{}, {}, {}]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+      const { defaultVoice } = EasySpeech.status()
+      expect(defaultVoice).to.equal(voices[0])
+    })
+  })
+  describe('EasySpeech.filterVoices', function () {
+    beforeEach(function () {
+      EasySpeech.reset()
+    })
+    it('returns no voices if no filter applied', async () => {
+      const voice = { lang: randomId() }
+      await initScope({
+        speechSynthesis: { getVoices: () => [voice] }
+      })
+      expect(EasySpeech.filterVoices({})).to.deep.equal([])
+    })
+    it('returns all voices by lang', async () => {
+      const lang = randomId()
+      const voices = [{ lang }, { lang: randomId()}, { lang }]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+
+      expect(EasySpeech.filterVoices({ language: lang }))
+        .to.deep.equal([voices[0], voices[2]])
+    })
+    it('returns all voices by name', async () => {
+      const name = randomId()
+      const voices = [{ name }, { name: randomId()}, { name }]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+
+      expect(EasySpeech.filterVoices({ name }))
+        .to.deep.equal([voices[0], voices[2]])
+    })
+    it('returns all voices by localService', async () => {
+      const localService = true
+      const voices = [{ localService }, { localService: false }, { localService }]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+
+      expect(EasySpeech.filterVoices({ localService }))
+        .to.deep.equal([voices[0], voices[2]])
+      expect(EasySpeech.filterVoices({ localService: false }))
+        .to.deep.equal([voices[1]])
+    })
+    it('returns all voices by voiceURI', async () => {
+      const voiceURI = randomId()
+      const voices = [{ voiceURI }, { voiceURI: randomId()}, { voiceURI }]
+      await initScope({
+        speechSynthesis: { getVoices: () => voices }
+      })
+
+      expect(EasySpeech.filterVoices({ voiceURI }))
+        .to.deep.equal([voices[0], voices[2]])
     })
   })
   describe('EasySpeech.init', function () {
