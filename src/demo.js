@@ -8,6 +8,9 @@ document.body.onload = async () => {
   initInputs(initialized)
   await initSpeak(initialized)
   initEvents(initialized)
+
+  // make avialable to play around
+  window.EasySpeech = EasySpeech
 }
 
 let logBody
@@ -131,6 +134,22 @@ async function populateVoices (initialized) {
     }
   })
 
+  // sometimes there is no default voice, so we need to detect some
+  // default voice and lang algorithmically
+  const userLang = (window.navigator || {}).language || ''
+  const userCode = userLang.split(/[-_]/)[0]
+
+  if (!defaultLang && languages.has(userCode)) {
+    // this could be improved, once we get a list of
+    // heuristics that indicate quality of the voices
+    const defaultVoice = EasySpeech.filterVoices({ language: userCode })[0]
+
+    if (defaultVoice) {
+      defaultLang = userCode
+      defaultURI = defaultVoice.voiceURI
+    }
+  }
+
   debug(`found ${languages.size} languages`)
   debug('populate languages to select component')
 
@@ -175,11 +194,8 @@ function updateVoiceSelect (voices, value, defaultURI) {
   if (value) {
     filteredVoices = value === 'all'
       ? voices
-      : voices.filter(voice => (
-          voice.lang === value ||
-          voice.lang.indexOf(`${value}-`) > -1 ||
-          voice.lang.indexOf(`${value}_`) > -1)
-        )
+      : EasySpeech
+        .filterVoices({ language: value })
         .sort((a, b) => a.name.localeCompare(b.name))
 
     filteredVoices.forEach((voice, index) => {
