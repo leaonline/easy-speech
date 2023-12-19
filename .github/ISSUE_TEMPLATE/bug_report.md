@@ -7,6 +7,11 @@ assignees: ''
 
 ---
 
+<!-- to mark the checkbox as checked, fill it with an x => [x] -->
+
+[ ] I have read the [FAQ section](https://github.com/jankapunkt/easy-speech/blob/master/FAQ.md) and have checked
+    that none of it describe the issue I'm about to report.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
