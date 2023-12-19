@@ -176,8 +176,10 @@ function updateVoiceSelect (voices, value, defaultURI) {
     filteredVoices = value === 'all'
       ? voices
       : voices.filter(voice => (
-        voice.lang.indexOf(`${value}-`) > -1 ||
-          voice.lang.indexOf(`${value}_`) > -1))
+          voice.lang === value ||
+          voice.lang.indexOf(`${value}-`) > -1 ||
+          voice.lang.indexOf(`${value}_`) > -1)
+        )
         .sort((a, b) => a.name.localeCompare(b.name))
 
     filteredVoices.forEach((voice, index) => {
