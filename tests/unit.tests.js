@@ -156,7 +156,7 @@ describe('unit tests', function () {
     })
     it('returns all voices by lang', async () => {
       const lang = randomId()
-      const voices = [{ lang }, { lang: randomId()}, { lang }]
+      const voices = [{ lang }, { lang: randomId() }, { lang }]
       await initScope({
         speechSynthesis: { getVoices: () => voices }
       })
@@ -166,7 +166,7 @@ describe('unit tests', function () {
     })
     it('returns all voices by name', async () => {
       const name = randomId()
-      const voices = [{ name }, { name: randomId()}, { name }]
+      const voices = [{ name }, { name: randomId() }, { name }]
       await initScope({
         speechSynthesis: { getVoices: () => voices }
       })
@@ -188,7 +188,7 @@ describe('unit tests', function () {
     })
     it('returns all voices by voiceURI', async () => {
       const voiceURI = randomId()
-      const voices = [{ voiceURI }, { voiceURI: randomId()}, { voiceURI }]
+      const voices = [{ voiceURI }, { voiceURI: randomId() }, { voiceURI }]
       await initScope({
         speechSynthesis: { getVoices: () => voices }
       })
