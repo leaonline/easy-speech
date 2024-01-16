@@ -2,6 +2,7 @@ import EasySpeech from './EasySpeech.js'
 
 document.body.onload = async () => {
   createLog()
+  EasySpeech.debug(debug)
   appendFeatures(EasySpeech.detect())
   const initialized = await init()
   await populateVoices(initialized)
