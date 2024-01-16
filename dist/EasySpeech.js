@@ -248,6 +248,45 @@ const inGlobalScope = name => scope[name];
 EasySpeech.status = () => ({ ...internal });
 
 /**
+ * Returns a filtered subset of available voices by given
+ * parameters. Multiple parameters can be used.
+ * @param name {string=} a string that is expected to occur in the voices name; does not need to be the full name
+ * @param voiceURI {string=} a string that is expected to occur in the voices voiceURI; does not need to be the full URI
+ * @param language {string=} a language code to filter by .lang; short and long-form are accepted
+ * @param localService {boolean=} use true/false to include/exclude local/remote voices
+ * @return {SpeechSynthesisVoice[]} a list of voices, matching the given rules
+ */
+EasySpeech.getVoices = ({ name, language, localService, voiceURI }) => {
+  let voices = internal.voices || [];
+
+  const hasName = typeof name !== 'undefined';
+  const hasVoiceURI = typeof voiceURI !== 'undefined';
+  const hasLocalService = typeof localService !== 'undefined';
+  const hasLang = typeof language !== 'undefined';
+  const langCode = hasLang && language.split(/[-_]+/g)[0].toLocaleLowerCase();
+
+  return voices.filter(v => {
+    if (
+      (hasName && v.name.includes(name)) ||
+      (hasVoiceURI && v.voiceURI.includes(name)) ||
+      (hasLocalService && v.localService === localService)
+    ) {
+      return true
+    }
+
+    if (hasLang) {
+      const compareLang = v.lang && v.lang.toLocaleLowerCase();
+      return compareLang && (
+        compareLang === langCode ||
+        compareLang.indexOf(`${langCode}-`) > -1 ||
+        compareLang.indexOf(`${langCode}_`) > -1
+      )
+    }
+    return false
+  })
+};
+
+/**
  * Updates the internal status
  * @private
  * @param {String} s the current status to set
@@ -374,11 +413,11 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet, maxLengt
         // otherwise let's stick to the first one we can find by locale
         if (!internal.defaultVoice) {
           const language = (scope.navigator || {}).language || '';
-          const lang = language.split('-')[0];
+          const filtered = EasySpeech.getVoices({ language });
 
-          internal.defaultVoice = voices.find(v => {
-            return v.lang && (v.lang.indexOf(`${lang}-`) > -1 || v.lang.indexOf(`${lang}_`) > -1)
-          });
+          if (filtered.length > 0) {
+            internal.defaultVoice = filtered[0];
+          }
         }
 
         // otherwise let's use the first element in the array
