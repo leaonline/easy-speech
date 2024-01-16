@@ -256,9 +256,8 @@ EasySpeech.status = () => ({ ...internal });
  * @param localService {boolean=} use true/false to include/exclude local/remote voices
  * @return {SpeechSynthesisVoice[]} a list of voices, matching the given rules
  */
-EasySpeech.getVoices = ({ name, language, localService, voiceURI }) => {
-  let voices = internal.voices || [];
-
+EasySpeech.filterVoices = ({ name, language, localService, voiceURI }) => {
+  const voices = internal.voices || [];
   const hasName = typeof name !== 'undefined';
   const hasVoiceURI = typeof voiceURI !== 'undefined';
   const hasLocalService = typeof localService !== 'undefined';
@@ -268,7 +267,7 @@ EasySpeech.getVoices = ({ name, language, localService, voiceURI }) => {
   return voices.filter(v => {
     if (
       (hasName && v.name.includes(name)) ||
-      (hasVoiceURI && v.voiceURI.includes(name)) ||
+      (hasVoiceURI && v.voiceURI.includes(voiceURI)) ||
       (hasLocalService && v.localService === localService)
     ) {
       return true
@@ -413,7 +412,7 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet, maxLengt
         // otherwise let's stick to the first one we can find by locale
         if (!internal.defaultVoice) {
           const language = (scope.navigator || {}).language || '';
-          const filtered = EasySpeech.getVoices({ language });
+          const filtered = EasySpeech.filterVoices({ language });
 
           if (filtered.length > 0) {
             internal.defaultVoice = filtered[0];
