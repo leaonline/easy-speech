@@ -270,6 +270,38 @@ EasySpeech.status = function () {
 };
 
 /**
+ * Returns a filtered subset of available voices by given
+ * parameters. Multiple parameters can be used.
+ * @param name {string=} a string that is expected to occur in the voices name; does not need to be the full name
+ * @param voiceURI {string=} a string that is expected to occur in the voices voiceURI; does not need to be the full URI
+ * @param language {string=} a language code to filter by .lang; short and long-form are accepted
+ * @param localService {boolean=} use true/false to include/exclude local/remote voices
+ * @return {SpeechSynthesisVoice[]} a list of voices, matching the given rules
+ */
+EasySpeech.filterVoices = function (_ref) {
+  var name = _ref.name,
+    language = _ref.language,
+    localService = _ref.localService,
+    voiceURI = _ref.voiceURI;
+  var voices = internal.voices || [];
+  var hasName = typeof name !== 'undefined';
+  var hasVoiceURI = typeof voiceURI !== 'undefined';
+  var hasLocalService = typeof localService !== 'undefined';
+  var hasLang = typeof language !== 'undefined';
+  var langCode = hasLang && language.split(/[-_]+/g)[0].toLocaleLowerCase();
+  return voices.filter(function (v) {
+    if (hasName && v.name.includes(name) || hasVoiceURI && v.voiceURI.includes(voiceURI) || hasLocalService && v.localService === localService) {
+      return true;
+    }
+    if (hasLang) {
+      var compareLang = v.lang && v.lang.toLocaleLowerCase();
+      return compareLang && (compareLang === langCode || compareLang.indexOf("".concat(langCode, "-")) > -1 || compareLang.indexOf("".concat(langCode, "_")) > -1);
+    }
+    return false;
+  });
+};
+
+/**
  * Updates the internal status
  * @private
  * @param {String} s the current status to set
@@ -323,13 +355,13 @@ var status = function status(s) {
  */
 
 EasySpeech.init = function () {
-  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-    _ref$maxTimeout = _ref.maxTimeout,
-    maxTimeout = _ref$maxTimeout === void 0 ? 5000 : _ref$maxTimeout,
-    _ref$interval = _ref.interval,
-    interval = _ref$interval === void 0 ? 250 : _ref$interval,
-    quiet = _ref.quiet,
-    maxLengthExceeded = _ref.maxLengthExceeded;
+  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+    _ref2$maxTimeout = _ref2.maxTimeout,
+    maxTimeout = _ref2$maxTimeout === void 0 ? 5000 : _ref2$maxTimeout,
+    _ref2$interval = _ref2.interval,
+    interval = _ref2$interval === void 0 ? 250 : _ref2$interval,
+    quiet = _ref2.quiet,
+    maxLengthExceeded = _ref2.maxLengthExceeded;
   return new Promise(function (resolve, reject) {
     if (internal.initialized) {
       return resolve(false);
@@ -402,10 +434,12 @@ EasySpeech.init = function () {
         // otherwise let's stick to the first one we can find by locale
         if (!internal.defaultVoice) {
           var language = (scope.navigator || {}).language || '';
-          var lang = language.split('-')[0];
-          internal.defaultVoice = voices.find(function (v) {
-            return v.lang && (v.lang.indexOf("".concat(lang, "-")) > -1 || v.lang.indexOf("".concat(lang, "_")) > -1);
+          var filtered = EasySpeech.filterVoices({
+            language: language
           });
+          if (filtered.length > 0) {
+            internal.defaultVoice = filtered[0];
+          }
         }
 
         // otherwise let's use the first element in the array
@@ -491,8 +525,8 @@ EasySpeech.init = function () {
  * @private
  */
 var ensureInit = function ensureInit() {
-  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-    force = _ref2.force;
+  var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+    force = _ref3.force;
   if (!force && !internal.initialized) {
     throw new Error('EasySpeech: not initialized. Run EasySpeech.init() first');
   }
@@ -674,15 +708,15 @@ var createUtterance = function createUtterance(text) {
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
  * @reject {SpeechSynthesisEvent} rejects using the `error` event
  */
-EasySpeech.speak = function (_ref3) {
-  var text = _ref3.text,
-    voice = _ref3.voice,
-    pitch = _ref3.pitch,
-    rate = _ref3.rate,
-    volume = _ref3.volume,
-    force = _ref3.force,
-    infiniteResume = _ref3.infiniteResume,
-    handlers = _objectWithoutProperties(_ref3, _excluded);
+EasySpeech.speak = function (_ref4) {
+  var text = _ref4.text,
+    voice = _ref4.voice,
+    pitch = _ref4.pitch,
+    rate = _ref4.rate,
+    volume = _ref4.volume,
+    force = _ref4.force,
+    infiniteResume = _ref4.infiniteResume,
+    handlers = _objectWithoutProperties(_ref4, _excluded);
   ensureInit({
     force: force
   });
@@ -798,11 +832,11 @@ EasySpeech.speak = function (_ref3) {
 };
 
 /** @private **/
-var debugUtterance = function debugUtterance(_ref4) {
-  var voice = _ref4.voice,
-    pitch = _ref4.pitch,
-    rate = _ref4.rate,
-    volume = _ref4.volume;
+var debugUtterance = function debugUtterance(_ref5) {
+  var voice = _ref5.voice,
+    pitch = _ref5.pitch,
+    rate = _ref5.rate,
+    volume = _ref5.volume;
   debug("utterance: voice=".concat(voice === null || voice === void 0 ? void 0 : voice.name, " volume=").concat(volume, " rate=").concat(rate, " pitch=").concat(pitch));
 };
 
