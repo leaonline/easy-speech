@@ -126,7 +126,10 @@ describe('unit tests', function () {
       expect(defaultVoice).to.equal(voices[1])
     })
     it('sets a language-specific voice as default voice, if no .default is available', async () => {
-      global.navigator = { language: 'de-DE' }
+      const window = {}
+      window.window = window // this is intended!
+      global.window = global.window || window
+      window.navigator = { language: 'de-DE' }
       const voices = [{}, {}, { lang: 'de_DE' }]
       await initScope({
         speechSynthesis: { getVoices: () => voices }
