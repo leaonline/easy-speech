@@ -734,7 +734,14 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
     utterance.pitch = getValue({ pitch })
     utterance.rate = getValue({ rate })
     utterance.volume = getValue({ volume })
-    debugUtterance(utterance)
+
+    const isMsNatural =
+      utterance.voice &&
+      utterance.voice.name &&
+      utterance.voice.name
+        .toLocaleLowerCase()
+        .includes('(natural)')
+    debugUtterance(utterance, { isMsNatural })
 
     utteranceEvents.forEach(name => {
       const fn = handlers[name]
@@ -769,9 +776,15 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
       patches.paused = false
       patches.speaking = true
 
+      const defaultResumeInfinity = (
+        !isMsNatural &&
+        !patches.isFirefox &&
+        !patches.isSafari &&
+        patches.isAndroid !== true
+      )
       const useResumeInfinity = typeof infiniteResume === 'boolean'
         ? infiniteResume
-        : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true
+        : defaultResumeInfinity
 
       if (useResumeInfinity) {
         resumeInfinity(utterance)
@@ -798,15 +811,13 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
     clearTimeout(timeoutResumeInfinity)
     internal.speechSynthesis.cancel()
 
-    setTimeout(() => {
-      internal.speechSynthesis.speak(utterance)
-    }, 10)
+    setTimeout(() => internal.speechSynthesis.speak(utterance), 10)
   })
 }
 
 /** @private **/
-const debugUtterance = ({ voice, pitch, rate, volume }) => {
-  debug(`utterance: voice=${voice?.name} volume=${volume} rate=${rate} pitch=${pitch}`)
+const debugUtterance = ({ voice, pitch, rate, volume }, { isMsNatural = false } = {}) => {
+  debug(`utterance: voice=${voice?.name} volume=${volume} rate=${rate} pitch=${pitch} isMsNatural=${isMsNatural}`)
 }
 
 /**

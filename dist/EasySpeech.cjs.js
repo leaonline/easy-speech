@@ -769,7 +769,10 @@ EasySpeech.speak = function (_ref4) {
     utterance.volume = getValue({
       volume: volume
     });
-    debugUtterance(utterance);
+    var isMsNatural = utterance.voice && utterance.voice.name && utterance.voice.name.toLocaleLowerCase().includes('(natural)');
+    debugUtterance(utterance, {
+      isMsNatural: isMsNatural
+    });
     utteranceEvents.forEach(function (name) {
       var _internal$handlers;
       var fn = handlers[name];
@@ -801,7 +804,8 @@ EasySpeech.speak = function (_ref4) {
     utterance.addEventListener('start', function () {
       patches.paused = false;
       patches.speaking = true;
-      var useResumeInfinity = typeof infiniteResume === 'boolean' ? infiniteResume : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true;
+      var defaultResumeInfinity = !isMsNatural && !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true;
+      var useResumeInfinity = typeof infiniteResume === 'boolean' ? infiniteResume : defaultResumeInfinity;
       if (useResumeInfinity) {
         resumeInfinity(utterance);
       }
@@ -826,7 +830,7 @@ EasySpeech.speak = function (_ref4) {
     clearTimeout(timeoutResumeInfinity);
     internal.speechSynthesis.cancel();
     setTimeout(function () {
-      internal.speechSynthesis.speak(utterance);
+      return internal.speechSynthesis.speak(utterance);
     }, 10);
   });
 };
@@ -837,7 +841,10 @@ var debugUtterance = function debugUtterance(_ref5) {
     pitch = _ref5.pitch,
     rate = _ref5.rate,
     volume = _ref5.volume;
-  debug("utterance: voice=".concat(voice === null || voice === void 0 ? void 0 : voice.name, " volume=").concat(volume, " rate=").concat(rate, " pitch=").concat(pitch));
+  var _ref6 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+    _ref6$isMsNatural = _ref6.isMsNatural,
+    isMsNatural = _ref6$isMsNatural === void 0 ? false : _ref6$isMsNatural;
+  debug("utterance: voice=".concat(voice === null || voice === void 0 ? void 0 : voice.name, " volume=").concat(volume, " rate=").concat(rate, " pitch=").concat(pitch, " isMsNatural=").concat(isMsNatural));
 };
 
 /**
