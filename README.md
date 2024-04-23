@@ -18,6 +18,7 @@ Cross browser Speech Synthesis; no dependencies.
 ![npm](https://img.shields.io/npm/v/easy-speech)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
+[![DOI](https://zenodo.org/badge/432159293.svg)](https://zenodo.org/doi/10.5281/zenodo.10816462)
 
 
 ## ⭐️ Why EasySpeech?
