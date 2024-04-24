@@ -248,6 +248,44 @@ const inGlobalScope = name => scope[name]
 EasySpeech.status = () => ({ ...internal })
 
 /**
+ * Returns a filtered subset of available voices by given
+ * parameters. Multiple parameters can be used.
+ * @param name {string=} a string that is expected to occur in the voices name; does not need to be the full name
+ * @param voiceURI {string=} a string that is expected to occur in the voices voiceURI; does not need to be the full URI
+ * @param language {string=} a language code to filter by .lang; short and long-form are accepted
+ * @param localService {boolean=} use true/false to include/exclude local/remote voices
+ * @return {SpeechSynthesisVoice[]} a list of voices, matching the given rules
+ */
+EasySpeech.filterVoices = ({ name, language, localService, voiceURI }) => {
+  const voices = internal.voices || []
+  const hasName = typeof name !== 'undefined'
+  const hasVoiceURI = typeof voiceURI !== 'undefined'
+  const hasLocalService = typeof localService !== 'undefined'
+  const hasLang = typeof language !== 'undefined'
+  const langCode = hasLang && language.split(/[-_]+/g)[0].toLocaleLowerCase()
+
+  return voices.filter(v => {
+    if (
+      (hasName && v.name.includes(name)) ||
+      (hasVoiceURI && v.voiceURI.includes(voiceURI)) ||
+      (hasLocalService && v.localService === localService)
+    ) {
+      return true
+    }
+
+    if (hasLang) {
+      const compareLang = v.lang && v.lang.toLocaleLowerCase()
+      return compareLang && (
+        compareLang === langCode ||
+        compareLang.indexOf(`${langCode}-`) > -1 ||
+        compareLang.indexOf(`${langCode}_`) > -1
+      )
+    }
+    return false
+  })
+}
+
+/**
  * Updates the internal status
  * @private
  * @param {String} s the current status to set
@@ -374,11 +412,11 @@ EasySpeech.init = function ({ maxTimeout = 5000, interval = 250, quiet, maxLengt
         // otherwise let's stick to the first one we can find by locale
         if (!internal.defaultVoice) {
           const language = (scope.navigator || {}).language || ''
-          const lang = language.split('-')[0]
+          const filtered = EasySpeech.filterVoices({ language })
 
-          internal.defaultVoice = voices.find(v => {
-            return v.lang && (v.lang.indexOf(`${lang}-`) > -1 || v.lang.indexOf(`${lang}_`) > -1)
-          })
+          if (filtered.length > 0) {
+            internal.defaultVoice = filtered[0]
+          }
         }
 
         // otherwise let's use the first element in the array
@@ -696,7 +734,14 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
     utterance.pitch = getValue({ pitch })
     utterance.rate = getValue({ rate })
     utterance.volume = getValue({ volume })
-    debugUtterance(utterance)
+
+    const isMsNatural =
+      utterance.voice &&
+      utterance.voice.name &&
+      utterance.voice.name
+        .toLocaleLowerCase()
+        .includes('(natural)')
+    debugUtterance(utterance, { isMsNatural })
 
     utteranceEvents.forEach(name => {
       const fn = handlers[name]
@@ -731,9 +776,15 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
       patches.paused = false
       patches.speaking = true
 
+      const defaultResumeInfinity = (
+        !isMsNatural &&
+        !patches.isFirefox &&
+        !patches.isSafari &&
+        patches.isAndroid !== true
+      )
       const useResumeInfinity = typeof infiniteResume === 'boolean'
         ? infiniteResume
-        : !patches.isFirefox && !patches.isSafari && patches.isAndroid !== true
+        : defaultResumeInfinity
 
       if (useResumeInfinity) {
         resumeInfinity(utterance)
@@ -760,15 +811,13 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
     clearTimeout(timeoutResumeInfinity)
     internal.speechSynthesis.cancel()
 
-    setTimeout(() => {
-      internal.speechSynthesis.speak(utterance)
-    }, 10)
+    setTimeout(() => internal.speechSynthesis.speak(utterance), 10)
   })
 }
 
 /** @private **/
-const debugUtterance = ({ voice, pitch, rate, volume }) => {
-  debug(`utterance: voice=${voice?.name} volume=${volume} rate=${rate} pitch=${pitch}`)
+const debugUtterance = ({ voice, pitch, rate, volume }, { isMsNatural = false } = {}) => {
+  debug(`utterance: voice=${voice?.name} volume=${volume} rate=${rate} pitch=${pitch} isMsNatural=${isMsNatural}`)
 }
 
 /**

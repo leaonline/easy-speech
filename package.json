@@ -1,6 +1,6 @@
 {
   "name": "easy-speech",
-  "version": "2.2.0",
+  "version": "2.3.1",
   "description": "Cross browser Speech Synthesis",
   "type": "module",
   "main": "./dist/EasySpeech.cjs.js",
@@ -51,10 +51,13 @@
     "snazzy": "^9.0.0",
     "standard": "17.1.0"
   },
-  "funding": {
+  "funding": [{
+    "type": "GitHub",
+    "url": "https://github.com/sponsors/jankapunkt"
+  },{
     "type": "PayPal",
     "url": "https://paypal.me/kuesterjan"
-  },
+  }],
   "engines": {
     "node": ">= 14.x"
   },

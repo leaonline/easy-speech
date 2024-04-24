@@ -8,6 +8,7 @@
             * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
             * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
             * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
+            * [.filterVoices([name], [voiceURI], [language], [localService])](#module_EasySpeech--module.exports..EasySpeech.filterVoices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
             * [.init(maxTimeout, interval, [quiet], [maxLengthExceeded])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
             * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
             * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
@@ -62,6 +63,7 @@ const example = async () => {
     * [.debug(fn)](#module_EasySpeech--module.exports..EasySpeech.debug)
     * [.detect()](#module_EasySpeech--module.exports..EasySpeech.detect) ⇒ <code>object</code>
     * [.status()](#module_EasySpeech--module.exports..EasySpeech.status) ⇒ <code>Object</code>
+    * [.filterVoices([name], [voiceURI], [language], [localService])](#module_EasySpeech--module.exports..EasySpeech.filterVoices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
     * [.init(maxTimeout, interval, [quiet], [maxLengthExceeded])](#module_EasySpeech--module.exports..EasySpeech.init) ⇒ <code>Promise.&lt;Boolean&gt;</code>
     * [.voices()](#module_EasySpeech--module.exports..EasySpeech.voices) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
     * [.on(handlers)](#module_EasySpeech--module.exports..EasySpeech.on) ⇒ <code>Object</code>
@@ -159,6 +161,22 @@ EasySpeech.status()
   handlers: {}
 }
 ```
+<a name="module_EasySpeech--module.exports..EasySpeech.filterVoices"></a>
+
+##### EasySpeech.filterVoices([name], [voiceURI], [language], [localService]) ⇒ <code>Array.&lt;SpeechSynthesisVoice&gt;</code>
+Returns a filtered subset of available voices by given
+parameters. Multiple parameters can be used.
+
+**Kind**: static method of [<code>EasySpeech</code>](#module_EasySpeech--module.exports..EasySpeech)  
+**Returns**: <code>Array.&lt;SpeechSynthesisVoice&gt;</code> - a list of voices, matching the given rules  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [name] | <code>string</code> | a string that is expected to occur in the voices name; does not need to be the full name |
+| [voiceURI] | <code>string</code> | a string that is expected to occur in the voices voiceURI; does not need to be the full URI |
+| [language] | <code>string</code> | a language code to filter by .lang; short and long-form are accepted |
+| [localService] | <code>boolean</code> | use true/false to include/exclude local/remote voices |
+
 <a name="module_EasySpeech--module.exports..EasySpeech.init"></a>
 
 ##### EasySpeech.init(maxTimeout, interval, [quiet], [maxLengthExceeded]) ⇒ <code>Promise.&lt;Boolean&gt;</code>

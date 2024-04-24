@@ -2,12 +2,16 @@ import EasySpeech from './EasySpeech.js'
 
 document.body.onload = async () => {
   createLog()
+  EasySpeech.debug(debug)
   appendFeatures(EasySpeech.detect())
   const initialized = await init()
   await populateVoices(initialized)
   initInputs(initialized)
   await initSpeak(initialized)
   initEvents(initialized)
+
+  // make avialable to play around
+  window.EasySpeech = EasySpeech
 }
 
 let logBody
@@ -32,7 +36,7 @@ const inputs = {
 
 function initInputs (initialized) {
   if (!initialized) return
-
+  debug('init volume input')
   const volumeValue = document.querySelector('.volume-value')
   inputs.volume = document.querySelector('#volume-input')
   inputs.volume.disabled = false
@@ -42,6 +46,7 @@ function initInputs (initialized) {
     volumeValue.appendChild(document.createTextNode(values.volume))
   })
 
+  debug('init rate input')
   const rateValue = document.querySelector('.rate-value')
   inputs.rate = document.querySelector('#rate-input')
   inputs.rate.disabled = false
@@ -51,6 +56,7 @@ function initInputs (initialized) {
     rateValue.appendChild(document.createTextNode(values.rate))
   })
 
+  debug('init pitch input')
   const pitchValue = document.querySelector('.pitch-value')
   inputs.pitch = document.querySelector('#pitch-input')
   inputs.pitch.disabled = false
@@ -73,11 +79,12 @@ function createLog () {
   EasySpeech.debug(debug)
 }
 
-function debug (arg) {
-  logBody.appendChild(textNode(arg))
+function debug (...arg) {
+  logBody.appendChild(textNode(arg.join(' ')))
 }
 
 async function init () {
+  debug('init EasySpeech')
   const header = document.querySelector('.init-status-header')
   const loader = document.querySelector('.init-status-loader')
   const text = document.querySelector('.init-status-text')
@@ -91,6 +98,8 @@ async function init () {
     message = 'Successfully intialized 🎉'
     summary = 'Successful'
   } catch (e) {
+    console.error(e)
+    debug('error:', e.message)
     success = false
     message = e.message
     summary = 'Failed'
@@ -115,7 +124,7 @@ async function init () {
 async function populateVoices (initialized) {
   if (!initialized) return
 
-  debug('find unique languages...')
+  debug('init voice select')
   const voices = EasySpeech.voices()
   const languages = new Set()
   let defaultLang
@@ -128,11 +137,29 @@ async function populateVoices (initialized) {
     if (voice.default) {
       defaultLang = lang
       defaultURI = voice.voiceURI
+      debug(`detected a default voice ${voice.name}; voice lang=${defaultLang}`)
     }
   })
 
-  debug(`found ${languages.size} languages`)
-  debug('populate languages to select component')
+  // sometimes there is no default voice, so we need to detect some
+  // default voice and lang algorithmically
+  const userLang = (window.navigator || {}).language || ''
+  const userCode = userLang.split(/[-_]/)[0]
+  debug('detected user lang is', userCode, `(${userLang})`)
+
+  if (!defaultLang && languages.has(userCode)) {
+    // this could be improved, once we get a list of
+    // heuristics that indicate quality of the voices
+    const defaultVoice = EasySpeech.filterVoices({ language: userCode })[0]
+
+    if (defaultVoice) {
+      defaultLang = userCode
+      defaultURI = defaultVoice.voiceURI
+      debug(`set a default voice ${defaultURI}`)
+    }
+  }
+
+  debug(`populate ${languages.size} languages to select component`)
 
   inputs.language = document.querySelector('#lang-select')
   Array.from(languages).sort().forEach(lang => {
@@ -166,6 +193,7 @@ async function populateVoices (initialized) {
 }
 
 function updateVoiceSelect (voices, value, defaultURI) {
+  debug('update selected voice', value)
   while (inputs.voice.firstChild) {
     inputs.voice.removeChild(inputs.voice.lastChild)
   }
@@ -175,11 +203,8 @@ function updateVoiceSelect (voices, value, defaultURI) {
   if (value) {
     filteredVoices = value === 'all'
       ? voices
-      : voices.filter(voice => (
-          voice.lang === value ||
-          voice.lang.indexOf(`${value}-`) > -1 ||
-          voice.lang.indexOf(`${value}_`) > -1)
-        )
+      : EasySpeech
+        .filterVoices({ language: value })
         .sort((a, b) => a.name.localeCompare(b.name))
 
     filteredVoices.forEach((voice, index) => {
@@ -209,10 +234,12 @@ function updateVoiceSelect (voices, value, defaultURI) {
 function selectVoice (index) {
   if (index < 0 || index > filteredVoices.length - 1) {
     values.voice = undefined
+    debug('no voice found by index', index)
     return
   }
 
   values.voice = (filteredVoices || [])[index]
+  debug('select voice', values.voice && values.voice.name)
 }
 
 function initSpeak (inititalized) {
@@ -269,7 +296,10 @@ function initEvents (initialized) {
     boundary: logEvent,
     start: logEvent,
     end: logEvent,
-    error: logEvent
+    error: e => {
+      console.error(e)
+      debug(`error: ${e.message}`)
+    }
   })
 }
 
