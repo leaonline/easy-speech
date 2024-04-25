@@ -1,4 +1,4 @@
-var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume"];
+var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume", "noStop"];
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -691,6 +691,7 @@ var createUtterance = function createUtterance(text) {
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
  * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
  * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
+ * @param {boolean=} options.noStop - Optional, if true will not stop current voices
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -700,7 +701,6 @@ var createUtterance = function createUtterance(text) {
  * @param {function=} handlers.pause - optional, event handler
  * @param {function=} handlers.resume - optional, event handler
  * @param {function=} handlers.start - optional, event handler
- *
  *
  * @return {Promise<SpeechSynthesisEvent|SpeechSynthesisErrorEvent>}
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
@@ -714,6 +714,7 @@ EasySpeech.speak = function (_ref4) {
     volume = _ref4.volume,
     force = _ref4.force,
     infiniteResume = _ref4.infiniteResume,
+    noStop = _ref4.noStop,
     handlers = _objectWithoutProperties(_ref4, _excluded);
   ensureInit({
     force: force
@@ -826,7 +827,11 @@ EasySpeech.speak = function (_ref4) {
 
     // make sure we have no mem-leak
     clearTimeout(timeoutResumeInfinity);
-    internal.speechSynthesis.cancel();
+
+    // do not cancel currently playing voice, if noStop option is true explicitly.
+    if (!(noStop === true)) {
+      internal.speechSynthesis.cancel();
+    }
     setTimeout(function () {
       return internal.speechSynthesis.speak(utterance);
     }, 10);
