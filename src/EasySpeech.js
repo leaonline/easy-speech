@@ -669,6 +669,7 @@ const createUtterance = text => {
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
  * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
  * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
+ * @param {boolean=} options.noStop - Optional, if true will not stop current voices
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -678,7 +679,6 @@ const createUtterance = text => {
  * @param {function=} handlers.pause - optional, event handler
  * @param {function=} handlers.resume - optional, event handler
  * @param {function=} handlers.start - optional, event handler
- *
  *
  * @return {Promise<SpeechSynthesisEvent|SpeechSynthesisErrorEvent>}
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
