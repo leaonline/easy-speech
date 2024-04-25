@@ -684,7 +684,7 @@ const createUtterance = text => {
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
  * @reject {SpeechSynthesisEvent} rejects using the `error` event
  */
-EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, ...handlers }) => {
+EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, noStop, ...handlers }) => {
   ensureInit({ force })
 
   if (!validate.text(text)) {
@@ -809,7 +809,11 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
 
     // make sure we have no mem-leak
     clearTimeout(timeoutResumeInfinity)
-    internal.speechSynthesis.cancel()
+
+    // do not cancel currently playing voice, if noStop option is true explicitly.
+    if (!(noStop === true)) {
+      internal.speechSynthesis.cancel()
+    }
 
     setTimeout(() => internal.speechSynthesis.speak(utterance), 10)
   })
