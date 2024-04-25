@@ -810,9 +810,9 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, n
     // make sure we have no mem-leak
     clearTimeout(timeoutResumeInfinity)
 
-    //do not cancel currently playing voice, if noStop option is true explicitly.
+    // do not cancel currently playing voice, if noStop option is true explicitly.
     if (!(noStop === true)) {
-      internal.speechSynthesis.cancel();
+      internal.speechSynthesis.cancel()
     }
 
     setTimeout(() => internal.speechSynthesis.speak(utterance), 10)
