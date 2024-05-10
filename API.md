@@ -291,6 +291,7 @@ used as fallback.
 | [options.volume] | <code>number</code> | Optional volume value >= 0 and <= 1 |
 | [options.force] | <code>boolean</code> | Optional set to true to force speaking, no matter the internal state |
 | [options.infiniteResume] | <code>boolean</code> | Optional, force or prevent internal resumeInfinity pattern |
+| [options.noStop] | <code>boolean</code> | Optional, if true will not stop current voices |
 | [handlers] | <code>object</code> | optional additional local handlers, can be   directly added as top-level properties of the options |
 | [handlers.boundary] | <code>function</code> | optional, event handler |
 | [handlers.end] | <code>function</code> | optional, event handler |

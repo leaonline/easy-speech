@@ -669,6 +669,7 @@ const createUtterance = text => {
  * @param {number=} options.volume - Optional volume value >= 0 and <= 1
  * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
  * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
+ * @param {boolean=} options.noStop - Optional, if true will not stop current voices
  * @param {object=} handlers - optional additional local handlers, can be
  *   directly added as top-level properties of the options
  * @param {function=} handlers.boundary - optional, event handler
@@ -679,12 +680,11 @@ const createUtterance = text => {
  * @param {function=} handlers.resume - optional, event handler
  * @param {function=} handlers.start - optional, event handler
  *
- *
  * @return {Promise<SpeechSynthesisEvent|SpeechSynthesisErrorEvent>}
  * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
  * @reject {SpeechSynthesisEvent} rejects using the `error` event
  */
-EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, ...handlers }) => {
+EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, noStop, ...handlers }) => {
   ensureInit({ force })
 
   if (!validate.text(text)) {
@@ -809,7 +809,11 @@ EasySpeech.speak = ({ text, voice, pitch, rate, volume, force, infiniteResume, .
 
     // make sure we have no mem-leak
     clearTimeout(timeoutResumeInfinity)
-    internal.speechSynthesis.cancel()
+
+    // do not cancel currently playing voice, if noStop option is true explicitly.
+    if (!(noStop === true)) {
+      internal.speechSynthesis.cancel()
+    }
 
     setTimeout(() => internal.speechSynthesis.speak(utterance), 10)
   })

@@ -127,7 +127,7 @@ var EasySpeech = (function () {
     return typeof key === "symbol" ? key : String(key);
   }
 
-  var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume"];
+  var _excluded = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume", "noStop"];
   /**
    * @module EasySpeech
    * @typicalname EasySpeech
@@ -806,6 +806,7 @@ var EasySpeech = (function () {
    * @param {number=} options.volume - Optional volume value >= 0 and <= 1
    * @param {boolean=} options.force - Optional set to true to force speaking, no matter the internal state
    * @param {boolean=} options.infiniteResume - Optional, force or prevent internal resumeInfinity pattern
+   * @param {boolean=} options.noStop - Optional, if true will not stop current voices
    * @param {object=} handlers - optional additional local handlers, can be
    *   directly added as top-level properties of the options
    * @param {function=} handlers.boundary - optional, event handler
@@ -815,7 +816,6 @@ var EasySpeech = (function () {
    * @param {function=} handlers.pause - optional, event handler
    * @param {function=} handlers.resume - optional, event handler
    * @param {function=} handlers.start - optional, event handler
-   *
    *
    * @return {Promise<SpeechSynthesisEvent|SpeechSynthesisErrorEvent>}
    * @fulfill {SpeechSynthesisEvent} Resolves to the `end` event
@@ -829,6 +829,7 @@ var EasySpeech = (function () {
       volume = _ref4.volume,
       force = _ref4.force,
       infiniteResume = _ref4.infiniteResume,
+      noStop = _ref4.noStop,
       handlers = _objectWithoutProperties(_ref4, _excluded);
     ensureInit({
       force: force
@@ -941,7 +942,11 @@ var EasySpeech = (function () {
 
       // make sure we have no mem-leak
       clearTimeout(timeoutResumeInfinity);
-      internal.speechSynthesis.cancel();
+
+      // do not cancel currently playing voice, if noStop option is true explicitly.
+      if (!(noStop === true)) {
+        internal.speechSynthesis.cancel();
+      }
       setTimeout(function () {
         return internal.speechSynthesis.speak(utterance);
       }, 10);
