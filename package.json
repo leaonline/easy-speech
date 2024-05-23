@@ -1,11 +1,22 @@
 {
   "name": "easy-speech",
-  "version": "2.3.1",
+  "version": "2.4.0-rc.0",
   "description": "Cross browser Speech Synthesis",
   "type": "module",
   "main": "./dist/EasySpeech.cjs.js",
   "browser": "./dist/EasySpeech.iife.js",
-  "exports": "./dist/EasySpeech.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/EasySpeech.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/EasySpeech.cjs.js"
+      }
+    }
+  },
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/mocha 'tests/**/*.tests.js'",
@@ -47,7 +58,7 @@
     "mocha": "^10.2.0",
     "rollup": "^4.3.0",
     "rollup-plugin-copy": "^3.5.0",
-    "sinon": "^17.0.1",
+    "sinon": "^18.0.0",
     "snazzy": "^9.0.0",
     "standard": "17.1.0"
   },
