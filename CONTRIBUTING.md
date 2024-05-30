@@ -49,7 +49,7 @@ and discuss, whether this is a useful addition to the project.
 First, clone and install this project from source via
 
 ```bash
-$ git clone git@github.com:jankapunkt/easy-speech.git
+$ git clone git@github.com:leaonline/easy-speech.git
 $ cd easy-speech
 $ npm install
 ```
