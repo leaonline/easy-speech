@@ -6,15 +6,15 @@ Cross browser Speech Synthesis; no dependencies.
 
   <p align="center">
     <br />
-    <a href="https://github.com/jankapunkt/easy-speech/blob/master/API.md"><strong>API docs »</strong></a>
+    <a href="https://github.com/leaonline/easy-speech/blob/master/API.md"><strong>API docs »</strong></a>
     <br />
   </p>
 
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Test suite](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/tests.yml)
-[![CodeQL Semantic Analysis](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jankapunkt/easy-speech/actions/workflows/codeql-analysis.yml)
+[![Test suite](https://github.com/leaonline/easy-speech/actions/workflows/tests.yml/badge.svg)](https://github.com/leaonline/easy-speech/actions/workflows/tests.yml)
+[![CodeQL Semantic Analysis](https://github.com/leaonline/easy-speech/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/leaonline/easy-speech/actions/workflows/codeql-analysis.yml)
 ![npm](https://img.shields.io/npm/v/easy-speech)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/easy-speech)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/easy-speech)
@@ -44,10 +44,10 @@ API, this package is not usable.
 
 ## 🚀 Live Demo
 
-The live demo is available at https://jankapunkt.github.io/easy-speech/
+The live demo is available at https://leaonline.github.io/easy-speech/
 You can use it to test your browser for `speechSynthesis` support and functionality.
 
-[![live demo screenshot](./docs/demo_screenshot.png)](https://jankapunkt.github.io/easy-speech/)
+[![live demo screenshot](./docs/demo_screenshot.png)](https://leaonline.github.io/easy-speech/)
 
 ## Table of Contents
 
