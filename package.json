@@ -58,7 +58,7 @@
     "mocha": "^10.2.0",
     "rollup": "^4.3.0",
     "rollup-plugin-copy": "^3.5.0",
-    "sinon": "^18.0.0",
+    "sinon": "^19.0.2",
     "snazzy": "^9.0.0",
     "standard": "17.1.0"
   },
