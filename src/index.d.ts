@@ -91,4 +91,11 @@ export default class EasySpeech {
   public static pause(): void;
 
   public static reset(): void;
+
+  public static filterVoices(options: {
+    name?: string;
+    language?: string;
+    localService?: boolean;
+    voiceURI?: string;
+  }): SpeechSynthesisVoice[];
 }
