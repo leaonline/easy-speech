@@ -20,6 +20,7 @@
 - [My voices are gone or have changed after I updated my OS](#my-voices-are-gone-or-have-changed-after-i-updated-my-os)
 - [Error 'EasySpeech: text exceeds max length of 4096 bytes.'](#error-easyspeech-text-exceeds-max-length-of-4096-bytes)
 - [Safari plays speech delayed after interaction with other audio](#safari-plays-speech-delayed-after-interaction-with-other-audio)
+- [speechSynthesis.speak function not working on iOS Safari when triggered programmatically](#speechsynthesisspeak-function-not-working-on-ios-safari-when-triggered-programmatically)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -137,3 +138,31 @@ You can try to speak with `volume=0` before your actual voice is intended to spe
 
 Related issues:
 - https://github.com/jankapunkt/easy-speech/issues/51
+
+## speechSynthesis.speak function not working on iOS Safari when triggered programmatically
+
+The issue on iOS devices is likely due to WebKit's autoplay restrictions on speech synthesis.
+Safari blocks `speechSynthesis.speak()` when it's not triggered by a direct user interaction, such as a button click. 
+If invoked from an asynchronous source like an API response 
+— especially within a useEffect — it fails because there's no associated user gesture.
+
+**Workaround:**
+To bypass this restriction, initiate a minimal call to speechSynthesis.speak() 
+during an actual user interaction (e.g., clicking a button or sending the first message). 
+
+In order to not disturb the user, you can use a dummy utterance like this:
+
+```js
+await EasySpeech.speak({
+text: " ",     // whitespace
+volume: 0,     // muted
+rate: 10       // very fast
+});
+```
+
+This creates a "trusted session" in Safari. Once this is done:
+
+Subsequent calls to `.speak()` will work programmatically, even without user interaction.
+
+Related issues:
+- https://github.com/leaonline/easy-speech/issues/366
