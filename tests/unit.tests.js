@@ -129,7 +129,7 @@ describe('unit tests', function () {
       if (globalThis.navigator) {
         sinon.stub(globalThis.navigator, 'language').get(() => 'de-DE')
       } else {
-        sinon.define(globalThis, 'navigator').get(() => ({ language: 'de-DE' }))
+        sinon.define(globalThis, 'navigator', { language: 'de-DE' })
       }
 
       const voices = [{}, {}, { lang: 'de_DE' }]
