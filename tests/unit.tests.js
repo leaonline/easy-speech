@@ -127,7 +127,7 @@ describe('unit tests', function () {
     })
     it('sets a language-specific voice as default voice, if no .default is available', async () => {
       if (globalThis.navigator) {
-        sinon.stub(globalThis, 'navigator').get(() => ({ language: 'de-DE' }))
+        sinon.stub(globalThis.navigator, 'language').get(() => 'de-DE')
       } else {
         sinon.define(globalThis, 'navigator').get(() => ({ language: 'de-DE' }))
       }
