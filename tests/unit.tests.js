@@ -132,7 +132,8 @@ describe('unit tests', function () {
       } else {
         Object.defineProperty(globalThis, 'navigator', {
           value: { language: 'de-DE' },
-          configurable: true
+          configurable: true,
+          writable: true
         })
         navigatorDefined = true
       }
