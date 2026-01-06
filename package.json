@@ -73,7 +73,7 @@
     }
   ],
   "engines": {
-    "node": ">= 14.x"
+    "node": ">= 18.x"
   },
   "files": [
     "dist",
