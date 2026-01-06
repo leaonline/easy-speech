@@ -126,18 +126,30 @@ describe('unit tests', function () {
       expect(defaultVoice).to.equal(voices[1])
     })
     it('sets a language-specific voice as default voice, if no .default is available', async () => {
+      let navigatorDefined = false
       if (globalThis.navigator) {
         sinon.stub(globalThis.navigator, 'language').get(() => 'de-DE')
       } else {
-        sinon.define(globalThis, 'navigator', { language: 'de-DE' })
+        Object.defineProperty(globalThis, 'navigator', {
+          value: { language: 'de-DE' },
+          configurable: true,
+          writable: true
+        })
+        navigatorDefined = true
       }
 
-      const voices = [{}, {}, { lang: 'de_DE' }]
-      await initScope({
-        speechSynthesis: { getVoices: () => voices }
-      })
-      const { defaultVoice } = EasySpeech.status()
-      expect(defaultVoice).to.equal(voices[2])
+      try {
+        const voices = [{}, {}, { lang: 'de_DE' }]
+        await initScope({
+          speechSynthesis: { getVoices: () => voices }
+        })
+        const { defaultVoice } = EasySpeech.status()
+        expect(defaultVoice).to.equal(voices[2])
+      } finally {
+        if (navigatorDefined) {
+          delete globalThis.navigator
+        }
+      }
     })
     it('sets he first available voice as default, if no lang is available', async () => {
       const voices = [{}, {}, {}]
