@@ -51,7 +51,7 @@
     "@babel/preset-env": "^7.23.2",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "c8": "^8.0.0",
     "chai": "^5.1.0",
     "jsdoc-to-markdown": "^9.1.3",
